@@ -1,0 +1,241 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Data::Dumper qw( Dumper );
+use English qw( -no_match_vars );
+use Getopt::Long;
+use Pod::Usage;
+
+use lib "lib";
+use Provision::Unix;
+use Provision::Unix::DNS;
+use Provision::Unix::Utility;
+
+my $prov = Provision::Unix->new( debug => 0 );
+my $dns  = Provision::Unix::DNS->new( prov => $prov );
+my $util = Provision::Unix::Utility->new( prov => $prov, debug => 0);
+
+# process command line options
+Getopt::Long::GetOptions(
+
+    'action=s' => \my $action,
+    'zone=s'   => \my $zone,
+    'type=s'   => \my $type,
+
+    'serial=s'  => \my $serial,
+    'ttl=s'     => \my $ttl,
+    'refresh=s' => \my $refresh,
+    'retry=s'   => \my $retry,
+    'expire=s'  => \my $expire,
+    'minimum=s' => \my $minimum,
+    'nameserver=s' => \my $nameserver,
+    'name=s'     => \my $name,
+    'address=s'  => \my $address,
+    'weight=s'   => \my $weight,
+    'priority=s' => \my $priority,
+    'template=s' => \my $template,
+    'port=s'     => \my $port,
+
+    'verbose'    => \my $debug,
+
+    'help'       => \my $help,
+    'version'    => \my $version,
+
+) or die "error parsing command line options";
+
+my $questions = {
+    action   => "the action to perform: create, delete", 
+    zone     => "the zone name",
+
+    serial   => "the serial number",
+    ttl      => "the TTL",
+    refresh  => "the zone refresh interval",
+    retry    => "the zone retry   interval",
+    expire   => "the zone expiration time",
+    minimum  => "the zone minimum",
+    nameserver => "a nameserver authoritative for this zone",
+    name     => "the zone record name",
+    address  => "the zone record address",
+    weight   => "the zone record weight",
+    priority => "the zone record priority",
+    port     => "the zone record port",
+};
+
+pod2usage( { -verbose => 3 } ) if $help;
+$prov->get_version() and exit if $version;
+
+$action ||= $util->ask( $questions->{action}, default=>'create' );
+$action = lc($action);
+
+my %actions = map { $_ => 1 } qw/ create destroy /;
+pod2usage( { -verbose => 1 } ) if !$actions{$action};
+
+$zone ||= $util->ask( "the zone name" );
+$zone = lc($zone);
+
+my %types = map { $_ => 1 } qw/ zone a ptr ns mx txt srv cname aaaa /;
+while ( ! $types{$type} ) {
+    $type = $util->ask( "the DNS entity would you like to $action:
+\t zone, A, PTR, NS, MX, TXT, SRV, CNAME, or AAAA" );
+    $type = lc($type);
+};
+
+  $action eq 'create'   ? dns_create()
+: $action eq 'destroy'  ? dns_destroy()
+#: $action eq 'modify'   ? dns_modify()
+: die "oops, the action ($action) is invalid\n";
+
+
+sub dns_create {
+
+    print "creating!\n";
+
+    my %request = (
+        zone => $zone,
+        debug => 0,
+        fatal => 0,
+    );
+
+    if ( $type =~ /zone/i ) {
+        
+        my @d = $util->get_the_date(debug=>0);
+
+        if ( $prov->{config}{DNS}{server} ne 'nictool' ) {
+            $request{serial} =  $serial || $util->ask( $questions->{serial},  
+                default  => "$d[2]$d[1]$d[0]01" );
+            $request{ttl}    =  $ttl || $util->ask( $questions->{ttl},  
+                default  => $prov->{config}{DNS}{zone_ttl} );
+            $request{refresh} = $refresh || $util->ask( $questions->{refresh}, 
+                default  => $prov->{config}{DNS}{zone_refresh} );
+            $request{retry}  =  $retry  || $util->ask( $questions->{retry},   
+                default  => $prov->{config}{DNS}{zone_retry}  );
+            $request{expire} =  $expire || $util->ask( $questions->{expire},  
+                default  => $prov->{config}{DNS}{zone_expire} );
+            $request{minimum} = $minimum || $util->ask( $questions->{minimum}, 
+                default  => $prov->{config}{DNS}{zone_minimum} );
+            $request{nameserver} = $util->ask( $questions->{nameserver}, 
+                default  => "a.ns.$zone");
+        }
+        else {
+            $request{template} = $template || $util->ask( $questions->{template},
+                default  => $prov->{config}{NicTool}{template} );
+        }
+
+        return $dns->create_zone( %request );
+    }
+    
+    # create a zone record (A, AAAA, PTR, NS, MX, TXT, SRV, CNAME)
+    $request{type}    = uc($type);
+    $request{name}    = $name || $util->ask( $questions->{name} );
+    if ( lc( $prov->{config}{DNS}{server} ) ne 'nictool' ) {
+        $request{name} = $dns->fully_qualify( $zone, $request{name} );
+    }
+    $request{address} = $name || $util->ask( $questions->{address} );
+    $request{ttl}     = $name || $util->ask( $questions->{ttl},
+            default  => $prov->{config}{DNS}{ttl} );
+
+    if ( $type =~ /mx|srv/i ) {
+        $request{weight} = $weight || $util->ask( $questions->{weight},
+            default => $prov->{config}{DNS}{weight} );
+    }
+    elsif ($type =~ /srv/i ) {
+        $request{priority} = $priority || $util->ask( $questions->{priority},
+            default => 5 );
+        $request{port} = $port || $util->ask( $questions->{port} )
+            or $prov->error( 'SRV records require a port' );
+    }
+
+    return $dns->create_zone_record( %request );
+}
+
+sub dns_destroy {
+
+    if ( $type =~ /zone/i ) {
+        return $dns->destroy_zone(
+            zone  => $zone,
+            fatal => 0,
+            debug => 0,
+        );
+    }
+
+    # TODO: add support for deleting zone records
+    warn "no support for removing zone records yet.\n";
+}
+
+sub dns_modify {
+}
+
+
+
+=head1 NAME 
+
+prov_dns - a command line interface for provisioning dns zones
+
+=head1 SYNOPSIS
+
+  prov_dns --action=[]
+
+Action is one of the following:
+
+  create  - creates a new dns zone
+  delete  - remove a zone
+
+Other parameters are optional. Unless you specify --noprompt, you will be prompted for fill in any missing values.
+
+   --zone  - the FQDN of the zone to create
+   --serial
+   --ttl
+   --refresh
+   --retry
+   --expire
+   --minimum
+   --nameserver
+
+   --type  - a DNS RR type (A, MX, PTR, etc)
+   --name
+   --address
+   --weight
+   --priority
+   --port
+
+
+=head1 USAGE
+ 
+ prov_dns --action create  
+ prov_dns --action delete
+ 
+
+=head1 DESCRIPTION
+ 
+prov_dns is a command line interface to the Provision::DNS provisioning modules. 
+
+ 
+=head1 CONFIGURATION AND ENVIRONMENT
+ 
+Default settings are found in provision.conf, which should be located in your systems local etc directory (/etc, /usr/local/etc, or /opt/local/etc).
+
+=head1 DEPENDENCIES
+ 
+A list of all the other modules that this module relies upon, including any
+restrictions on versions, and an indication whether these required modules are
+part of the standard Perl distribution, part of the module's distribution,
+or must be installed separately.
+
+
+=head1 AUTHOR
+ 
+Matt Simerson, C<< <matt at tnpi.net> >>
+ 
+ 
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2009 The Network People, Inc. (info@tnpi.net)
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
