@@ -34,8 +34,7 @@ sub new {
     $self->{server} = $self->_get_server( debug => $p{debug}, fatal => $p{fatal} )
         or return undef;
 
-    require Provision::Unix::Utility;
-    $util = Provision::Unix::Utility->new( prov => $prov, debug=>$p{debug},fatal=>$p{fatal} );
+    $util = $prov->get_util;
     return $self;
 }
 

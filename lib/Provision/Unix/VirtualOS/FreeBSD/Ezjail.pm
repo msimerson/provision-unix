@@ -22,10 +22,7 @@ sub new {
     bless( $self, $class );
 
     $prov->audit( $class . sprintf( " loaded by %s, %s, %s", caller ) );
-
-    require Provision::Unix::Utility;
-    $util = Provision::Unix::Utility->new( prov => $prov );
-
+    $util = $prov->get_util;
     return $self;
 }
 

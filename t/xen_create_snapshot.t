@@ -7,7 +7,6 @@ use Test::More;
 
 use lib 'lib';
 use Provision::Unix;
-use Provision::Unix::Utility;
 use Provision::Unix::VirtualOS;
 
 my $prov = Provision::Unix->new( debug => 0 );

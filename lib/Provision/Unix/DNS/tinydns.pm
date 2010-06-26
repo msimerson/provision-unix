@@ -24,7 +24,7 @@ sub new {
 
     $prov = $p{prov};
     $prov->audit("loaded DNS/tinydns");
-    $util = Provision::Unix::Utility->new( prov => $prov );
+    $util = $prov->get_util;
 
     #$self->{server}  = $self->_load_DNS_TinyDNS();
     $self->{special} = $self->_special_chars();
@@ -88,8 +88,7 @@ sub create_zone {
     $soa .= ":";    # location (ala, split horizon)
 
     # append the record to $data
-    $util->file_write(
-        file   => "$service_dir/root/data",
+    $util->file_write( "$service_dir/root/data",
         lines  => [$soa],
         append => 1,
         debug  => $p{debug},
@@ -143,8 +142,7 @@ sub create_zone_record {
     my $service_dir = $prov->{config}{tinydns}{service_dir};
 
     # append the record to $data
-    $util->file_write(
-        file   => "$service_dir/root/data",
+    $util->file_write( "$service_dir/root/data",
         lines  => [$record],
         append => 1,
         debug  => $p{debug},
@@ -347,7 +345,7 @@ sub get_zone {
     $prov->audit("getting zone $zone");
 
     my $service_dir = $prov->{config}{tinydns}{service_dir};
-    my @lines = $util->file_read( file => "$service_dir/root/data" );
+    my @lines = $util->file_read( "$service_dir/root/data" );
 
     @lines = grep ( /^Z$zone:/, @lines );
 

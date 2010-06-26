@@ -12,10 +12,6 @@ use LWP::UserAgent;
 use Params::Validate qw(:all);
 use Time::Local;
 
-use lib 'lib';
-use Provision::Unix::Utility;
-
-
 our $AUTOLOAD;
 my ($prov, $util);
 my @std_opts = qw/ test_mode debug fatal /;
@@ -24,7 +20,6 @@ my %std_opts = (
     debug     => { type => BOOLEAN, optional => 1, default => 1 },
     fatal     => { type => BOOLEAN, optional => 1, default => 1 },
 );
-
 
 sub new {
 
@@ -48,8 +43,7 @@ sub new {
     $prov = $p{prov};
     my $debug = $p{debug};
     my $fatal = $p{fatal};
-    $util = Provision::Unix::Utility->new( prov=> $prov )
-        or die "unable to load P:U:Utility\n";
+    $util = $prov->get_util;
 
     my $self = {
         prov    => $prov,
@@ -692,7 +686,7 @@ sub set_nameservers {
     my @new;
     push @new, "searchdomain $searchdomain" if $searchdomain;
     if ( -f $resolv ) {
-        my @lines = $util->file_read( file => $resolv, fatal => $fatal );
+        my @lines = $util->file_read( $resolv, fatal => $fatal );
 
         foreach my $line ( @lines ) {
             next if $line =~ /^nameserver\s/i;
@@ -705,9 +699,7 @@ sub set_nameservers {
         push @new, "nameserver $_";
     };
 
-    return $util->file_write( 
-        file => $resolv, lines => \@new, fatal => $fatal,
-    );
+    return $util->file_write( $resolv, lines => \@new, fatal => $fatal );
 }
 
 sub set_password {
@@ -763,7 +755,7 @@ sub setup_log_files {
     my @logfiles = `find $fs_root/var/log/ -maxdepth 1 -type f -print`;
     foreach ( @logfiles ) {
         chomp $_;
-        $util->file_write( file => $_, lines => [ '' ], fatal => 0, debug => 0 );
+        $util->file_write( $_, lines => [ '' ], fatal => 0, debug => 0 );
     };
 };
 

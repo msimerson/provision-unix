@@ -8,7 +8,6 @@ use Test::More;
 use lib "lib";
 use Provision::Unix;
 use Provision::Unix::VirtualOS;
-use Provision::Unix::Utility;
 
 my $prov = Provision::Unix->new( debug => 0 );
 #warn Dumper($prov);

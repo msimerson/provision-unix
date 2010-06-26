@@ -50,9 +50,8 @@ if ( $server eq 'tinydns' ) {
         system("touch $service_dir/root/data");
     }
 
-    my $util = Provision::Unix::Utility->new( prov => $prov );
-    my $tdata
-        = $util->find_bin( 'tinydns-data', fatal => 0, debug => 0 );
+    my $util = $prov->get_util;
+    my $tdata = $util->find_bin( 'tinydns-data', fatal => 0 );
     if ( !$tdata || !-x $tdata ) {
 
         #$prov->error( 'djbdns is not installed' );

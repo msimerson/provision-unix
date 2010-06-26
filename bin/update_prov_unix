@@ -12,9 +12,8 @@ use LWP::UserAgent;
 
 use lib 'lib';
 use Provision::Unix;
-use Provision::Unix::Utility;
 my $prov = Provision::Unix->new( debug => 0 );
-my $util = Provision::Unix::Utility->new( prov => $prov );
+my $util = $prov->get_util;
 
 my $module = 'Provision::Unix';
 my $version_wanted = latest_on_cpan($module);

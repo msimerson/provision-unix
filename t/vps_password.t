@@ -22,9 +22,6 @@ else {
     plan 'no_plan';
 };
 
-use_ok('Provision::Unix::Utility');
-require_ok('Provision::Unix::Utility');
-
 # basic OO mechanism
 ok( defined $vos, 'get Provision::Unix::VirtualOS object' );
 ok( $vos->isa('Provision::Unix::VirtualOS'), 'check object class' );

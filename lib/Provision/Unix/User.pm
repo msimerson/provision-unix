@@ -36,7 +36,7 @@ sub new {
     $prov->audit("loaded User");
     $self->{os} = $self->_get_os() or return;
 
-    $util = Provision::Unix::Utility->new( prov => $prov );
+    $util = Provision::Unix::Utility->new( log => $prov );
     return $self;
 }
 
@@ -317,8 +317,7 @@ sub install_ssh_key {
     $line .= "command=\"$restricted\",no-port-forwarding,no-X11-forwarding,no-agent-forwarding "
         if $restricted;
     $line .= "$key\n";
-    $util->file_write(
-        file => "$ssh_dir/authorized_keys",
+    $util->file_write( "$ssh_dir/authorized_keys",
         lines => [ $line ], 
         mode  => '0600',
         debug => 0,
@@ -399,8 +398,7 @@ $r->{error_desc} will contain a string with a description of which test failed.
 
     if ( -r "/usr/local/etc/passwd.badpass" ) {
 
-        my @lines
-            = $util->file_read( file => "/usr/local/etc/passwd.badpass" );
+        my @lines = $util->file_read( "/usr/local/etc/passwd.badpass" );
         foreach my $line (@lines) {
             chomp $line;
             if ( $pass eq $line ) {
@@ -589,7 +587,7 @@ sub _is_valid_username {
     my $reserved = "/usr/local/etc/passwd.reserved";
     if ( -r $reserved ) {
         foreach my $line (
-            $util->file_read( file => $reserved, fatal => 0, debug => 0 ) )
+            $util->file_read( $reserved, fatal => 0, debug => 0 ) )
         {
             if ( $username eq $line ) {
                 return $prov->error( "\t$username is a reserved username.",

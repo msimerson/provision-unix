@@ -91,7 +91,7 @@ my $required_bin
     :                             undef;
 
 my %requires_template = map { $_ => 1 } qw/ xen ovz openvz virtuozzo /;
-my $util = Provision::Unix::Utility->new( prov => $prov, debug => 0 );
+my $util = $prov->get_util;
 
 if ( defined $required_bin ) {
     my $found_bin

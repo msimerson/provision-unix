@@ -122,8 +122,7 @@ sub set_rc_local {
         $rc_local = "$fs_root/etc/rc.local";  # everything else
     };
 
-    return $util->file_write( 
-        file   => $rc_local, 
+    return $util->file_write( $rc_local, 
         lines  => [ 'pkill -9 -f nash', 
                     'ldconfig > /dev/null', 
                     'depmod -a > /dev/null', 
@@ -215,8 +214,7 @@ EO_ADDTL_IPS
     my $config_file = "/etc/network/interfaces";
     return $config if $test_mode;
 
-    if ( $util->file_write( 
-            file => "$fs_root/$config_file", 
+    if ( $util->file_write( "$fs_root/$config_file", 
             lines => [ $config ], 
             %std_opts,
             ) 
@@ -262,7 +260,7 @@ sub set_ips_gentoo {
 
     my (@lines, @new_lines);
     if ( -r $net_conf ) {
-        @lines = $util->file_read( file => $net_conf, %std_opts )
+        @lines = $util->file_read( $net_conf, %std_opts )
             or $prov->error("error trying to read /etc/conf.d/net", %std_opts);
     };
     foreach ( @lines ) {
@@ -276,7 +274,7 @@ sub set_ips_gentoo {
     push @new_lines, $ip_string;
     push @new_lines, "routes_$device=(\n\t\"default via $gw\"\n)";
     $prov->audit("net config: $ip_string");
-    $util->file_write( file => $net_conf, lines => \@new_lines, %std_opts )
+    $util->file_write( $net_conf, lines => \@new_lines, %std_opts )
         or return $prov->error(
         "error setting up networking, unable to write to $net_conf", %std_opts);
 
@@ -323,7 +321,7 @@ HOSTNAME="$hostname"
 EO_NETFILE
 ;
     return $contents if $test_mode;
-    my $r = $util->file_write( file => "$etc/$netfile", lines => [ $contents ], %std_opts );
+    my $r = $util->file_write( "$etc/$netfile", lines => [ $contents ], %std_opts );
     $r ? $prov->audit("updated /etc/$netfile with hostname $hostname and gateway $gw")
        : $prov->error("failed to update $netfile", fatal => 0);
 
@@ -335,7 +333,7 @@ IPADDR=$ip
 NETMASK=255.255.255.0
 EO_IF_FILE
 ;
-    $r = $util->file_write( file => "$etc/$if_file", lines => [ $contents ], %std_opts );
+    $r = $util->file_write( "$etc/$if_file", lines => [ $contents ], %std_opts );
     $r ? $prov->audit("updated /etc/$if_file with ip $ip")
        : $prov->error("failed to update $if_file", %std_opts);
 
@@ -344,7 +342,7 @@ $net/24 dev $device scope host
 default via $gw
 EO_ROUTE_FILE
 ;
-    $r = $util->file_write( file => "$etc/$route_f", lines => [ $contents ], %std_opts );
+    $r = $util->file_write( "$etc/$route_f", lines => [ $contents ], %std_opts );
     $r ? $prov->audit("updated /etc/$route_f with net $net and gw $gw")
        : $prov->error("failed to update $route_f", %std_opts);
 
@@ -360,7 +358,7 @@ NETMASK=255.255.255.0
 EO_IF_FILE
 ;
         $alias_count++;
-        $r = $util->file_write( file => "$etc/$if_file", lines => [ $contents ], %std_opts );
+        $r = $util->file_write( "$etc/$if_file", lines => [ $contents ], %std_opts );
         $r ? $prov->audit("updated /etc/$if_file with device $device and ip $_")
            : $prov->error("failed to update $if_file", %std_opts);
     };
@@ -397,8 +395,7 @@ sub set_hostname_debian {
     my $host    = $p{host};
     my $fs_root = $p{fs_root};
 
-    $util->file_write( 
-        file  => "$fs_root/etc/hostname" , 
+    $util->file_write( "$fs_root/etc/hostname" , 
         lines => [ $host ], 
         %std_opts,
     )
@@ -421,8 +418,7 @@ sub set_hostname_gentoo {
 
     mkpath "$fs_root/etc/conf.d" if ! "$fs_root/etc/conf.d";
 
-    $util->file_write( 
-        file => "$fs_root/etc/conf.d/hostname" , 
+    $util->file_write( "$fs_root/etc/conf.d/hostname" , 
         lines => [ "HOSTNAME=$host" ],
         %std_opts,
     )
@@ -446,7 +442,7 @@ sub set_hostname_redhat {
     my $config = "$fs_root/etc/sysconfig/network";
     my @new;
     if ( -r $config ) {
-        my @lines = $util->file_read( file => $config, %std_opts );
+        my @lines = $util->file_read( $config, %std_opts );
         foreach ( @lines ) {
             next if $_ =~ /^HOSTNAME/;
             push @new, $_;
@@ -454,11 +450,7 @@ sub set_hostname_redhat {
     };
     push @new, "HOSTNAME=$host";
 
-    $util->file_write( 
-        file => $config, 
-        lines => \@new, 
-        %std_opts,
-    )
+    $util->file_write( $config, lines => \@new, %std_opts )
     or return $prov->error("failed to update $config with hostname $host", %std_opts);
 
     $prov->audit("updated $config with hostname $host");
@@ -489,8 +481,7 @@ exec $getty_cmd
 EO_INITTAB
 ;
 
-    $util->file_write( 
-        file  => "$fs_root/etc/event.d/xvc0", 
+    $util->file_write( "$fs_root/etc/event.d/xvc0", 
         lines => [ $contents ],
         %std_opts,
     ) or return;
@@ -499,7 +490,7 @@ EO_INITTAB
     my $serial = "$fs_root/etc/event.d/serial";
     return if ! -e $serial;
 
-    my @lines = $util->file_read( file => $serial, %std_opts );
+    my @lines = $util->file_read( $serial, %std_opts );
     my @new;
     foreach my $line ( @lines ) {
         if ( $line =~ /^[start|stop]/ ) {
@@ -508,8 +499,7 @@ EO_INITTAB
         };
         push @new, $line;
     }
-    $util->file_write( 
-        file  => "$fs_root/etc/event.d/serial", 
+    $util->file_write( "$fs_root/etc/event.d/serial", 
         lines => \@new,
         %std_opts,
     ) or return;
@@ -552,7 +542,7 @@ sub setup_inittab {
     };
 
     my $inittab = "$fs_root/etc/inittab";
-    my @lines = $util->file_read( file => $inittab, %std_opts );
+    my @lines = $util->file_read( $inittab, %std_opts );
     my @new;
     foreach ( @lines ) {
         next if $_ =~ /^1:/;
@@ -560,7 +550,7 @@ sub setup_inittab {
     }
     push @new, "1:2345:respawn:$getty_cmd";
     copy $inittab, "$inittab.dist";
-    $util->file_write( file => $inittab, lines => \@new, %std_opts )
+    $util->file_write( $inittab, lines => \@new, %std_opts )
         or return $prov->error( "unable to write $inittab", %std_opts);
 
     $prov->audit("updated /etc/inittab ");
@@ -586,8 +576,7 @@ int main() {
 EO_C_CODE
 ;
 
-    $util->file_write( 
-        file  => "$fs_root/tmp/autologin.c", 
+    $util->file_write( "$fs_root/tmp/autologin.c", 
         lines => [ $auto ], 
         %std_opts 
     ) or return;

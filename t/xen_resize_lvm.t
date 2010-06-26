@@ -7,10 +7,10 @@ use Test::More;
 
 use lib 'lib';
 use Provision::Unix;
-use Provision::Unix::Utility;
 use Provision::Unix::VirtualOS;
 
 my $prov = Provision::Unix->new( debug => 0 );
+my $util = $prov->get_util;
 my $vos;
 
 eval { $vos = Provision::Unix::VirtualOS->new( prov => $prov, fatal => 0, debug => 0 ) };
@@ -24,8 +24,6 @@ else {
 
 ok( defined $vos, 'get Provision::Unix::VirtualOS object' );
 ok( $vos->isa('Provision::Unix::VirtualOS'), 'check object class' );
-
-my $util = Provision::Unix::Utility->new( prov => $prov, debug => 0 );
 
 my $virt_class = ref $vos->{vtype};
 my @parts = split /::/, $virt_class;

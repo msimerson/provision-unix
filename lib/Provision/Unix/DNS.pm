@@ -29,7 +29,7 @@ sub new {
     };
     bless( $self, $class );
 
-    $util = Provision::Unix::Utility->new( prov => $p{prov}, debug=>$p{debug},fatal=>$p{fatal} );
+    $util = Provision::Unix::Utility->new( log => $p{prov}, debug=>$p{debug},fatal=>$p{fatal} );
     $self->{server} = $self->_get_server() or return;
     $self->{prov}->audit("loaded DNS");
 

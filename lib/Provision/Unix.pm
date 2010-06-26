@@ -37,6 +37,7 @@ sub new {
             ], 
         last_audit => 0,
         last_error => 0,
+        util   => undef,
     };
 
     bless( $self, $class );
@@ -192,6 +193,17 @@ sub get_datetime_from_epoch {
            $lt[3], $lt[2], $lt[1], $lt[0];
 }
 
+sub get_dns {
+    my $self = shift;
+    return $self->{dns} if ref $self->{dns};
+    require Provision::Unix::DNS;
+    $self->{util} = Provision::Unix::DNS->new( 
+            'log' => $self, 
+            debug => $self->{debug},
+            );
+    return $self->{dns};
+};
+
 sub get_errors {
     my $self = shift;
     return $self->{errors};
@@ -202,6 +214,17 @@ sub get_last_error {
     return $self->{errors}[-1]->{errmsg} if scalar @{ $self->{errors} };
     return;
 }
+
+sub get_util {
+    my $self = shift;
+    return $self->{util} if ref $self->{util};
+    require Provision::Unix::Utility;
+    $self->{util} = Provision::Unix::Utility->new( 
+            'log' => $self, 
+            debug => $self->{debug},
+            );
+    return $self->{util};
+};
 
 sub get_version {
     print "Provision::Unix version $VERSION\n";
@@ -362,11 +385,11 @@ Errors throw exceptions. This can be overridden by calling the method with fatal
 
 This call will throw an exception since it cannot find the file. 
 
-  $util->file_read(file=>'/etc/oopsie_a_typo');
+  $util->file_read('/etc/oopsie_a_typo');
 
 Setting fatal will cause it to return undef instead:
 
-  $util->file_read(file=>'/etc/oopsie_a_typo', fatal=>0);
+  $util->file_read('/etc/oopsie_a_typo', fatal=>0);
 
 =head2 Warnings and Messages
 

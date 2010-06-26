@@ -21,19 +21,17 @@ require_ok('Provision::Unix');
 require_ok('Provision::Unix::Utility');
 
 # let the testing begin
-
-# basic OO mechanism
-my $prov = Provision::Unix->new( debug => 0 );
-my $util = Provision::Unix::Utility->new( prov => $prov, debug => 0 );
+my $log = my $toaster = Provision::Unix->new( debug => 0 );
+my $util = Provision::Unix::Utility->new( log => $toaster, debug => 0 );
 ok( defined $util, 'get Provision::Unix::Utility object' );
-isa_ok( $util, 'Provision::Unix::Utility' );    # is it the right class?
+isa_ok( $util, 'Provision::Unix::Utility' );
 
 # for internal use
 if ( -e "Utility.t" ) { chdir "../"; }
 
 # we need this stuff during subsequent tests
 my $debug = 0;
-my ($cwd) = cwd =~ /^([\/\w\-\s\.]+)$/;         # get our current directory
+my ($cwd) = cwd =~ /^([\/\w\-\s\.]+)$/;       # get our current directory
 
 print "\t\twd: $cwd\n" if $debug;
 
@@ -81,21 +79,13 @@ SKIP: {
 # archive_expand
 my $gzip = $util->find_bin( "gzip", fatal => 0, debug => 0 );
 my $tar  = $util->find_bin( "tar",  fatal => 0, debug => 0 );
-my $file = $util->find_bin( "file", fatal => 0, debug => 0 );
 
 SKIP: {
-    skip "gzip or tar is missing!\n", 6 unless ( -x $gzip && -x $tar && -x $file && -d $tmp );
-    ok( $util->syscmd( "$tar -cf $tmp/test.tar TODO",
-            debug => 0,
-            fatal => 0
-        ),
+    skip "gzip or tar is missing!\n", 6 unless ( -x $gzip and -x $tar and -d $tmp );
+    ok( $util->syscmd( "$tar -cf $tmp/test.tar TODO", debug => 0, fatal => 0),
         "tar -cf test.tar"
     );
-    ok( $util->syscmd( "$gzip -f $tmp/test.tar",
-            debug => 0,
-            fatal => 0
-        ),
-        'gzip test.tar'
+    ok( $util->syscmd( "$gzip -f $tmp/test.tar", debug => 0, fatal => 0), 'gzip test.tar'
     );
 
     my $archive = "$tmp/test.tar.gz";
@@ -192,26 +182,21 @@ TODO: {
     # this way to run them but not count them as failures
     local $TODO = $why if ( -e '/dev/null' );
 
-#$extra = $util->yes_or_no( "can I run extended tests?", timeout=>5 );
+#$extra = $util->yes_or_no( question=>"can I run extended tests?", timeout=>5 );
 #ok ( $extra, 'yes_or_no' );
 }
 
 # file_read
 my $rwtest = "$tmp/rw-test";
-ok( $util->file_write(
-        file  => $rwtest,
-        lines => ["erase me please"],
-        debug => 0
-    ),
+ok( $util->file_write( $rwtest, lines => ["erase me please"], debug => 0),
     'file_write'
 );
-my @lines = $util->file_read( file => $rwtest, debug => 0 );
+my @lines = $util->file_read( $rwtest, debug => 0 );
 ok( @lines == 1, 'file_read' );
 
 # file_append
 # a typical invocation
-ok( $util->file_write(
-        file   => $rwtest,
+ok( $util->file_write( $rwtest,
         lines  => ["more junk"],
         append => 1,
         debug  => 0
@@ -221,17 +206,17 @@ ok( $util->file_write(
 
 # file_archive
 # a typical invocation
-my $backup = $util->file_archive( file => $rwtest, debug => 0, fatal => 0 );
+my $backup = $util->file_archive( $rwtest, debug => 0, fatal => 0 );
 ok( -e $backup, 'file_archive' );
 ok( $util->file_delete( file => $backup, debug => 0, fatal => 0 ),
     'file_delete' );
 
-ok( !$util->file_archive( file => $backup, debug => 0, fatal => 0 ),
+ok( !$util->file_archive( $backup, debug => 0, fatal => 0 ),
     'file_archive' );
 
 #    eval {
 #        # invalid param, will raise an exception
-#	    $util->file_archive( fil=>$backup, debug=>0,fatal=>0 );
+#	    $util->file_archive( $backup, debug=>0,fatal=>0 );
 #    };
 #	ok( $EVAL_ERROR , "file_archive");
 
@@ -253,20 +238,9 @@ SKIP: {
 
     ok( $util->cwd_source_dir( dir => $tmp, debug => 0 ), 'cwd_source_dir' );
 
-    ok( $util->file_get(
-            url   => "http://mail-toaster.org/etc/maildrop-qmail-domain",
-            debug => 0,
-        ),
-        'file_get'
-    );
-
-    ok( $util->file_get(
-            url   => "http://mail-toaster.org/etc/maildrop-qmail-domain",
-            dir   => $tmp,
-            debug => 0,
-        ),
-        'file_get'
-    );
+    my $url = "http://mail-toaster.org/etc/maildrop-qmail-domain";
+    ok( $util->file_get( url => $url ), 'file_get' );
+    ok( $util->file_get( url => $url, dir => $tmp ), 'file_get');
 
     #    print getcwd . "\n";
     #    ok( $util->file_get(
@@ -399,8 +373,7 @@ if ( lc($OSNAME) ne 'irix' ) {
 #$util->syscmd( "ls -al $rwtest" );
 
 # file_write
-ok( $util->file_write(
-        file  => $rwtest,
+ok( $util->file_write( $rwtest,
         lines => ["17"],
         debug => 0,
         fatal => 0
@@ -413,15 +386,14 @@ ok( $util->file_write(
 
 # files_diff
 # we need two files to work with
-$backup = $util->file_archive( file => $rwtest, debug => 0 );
+$backup = $util->file_archive( $rwtest, debug => 0 );
 
 # these two files are identical, so we should get 0 back from files_diff
 ok( !$util->files_diff( f1 => $rwtest, f2 => $backup, debug => 0 ),
     'files_diff' );
 
 # now we change one of the files, and this time they should be different
-ok( $util->file_write(
-        file   => $rwtest,
+ok( $util->file_write( $rwtest,
         lines  => ["more junk"],
         debug  => 0,
         append => 1
@@ -432,7 +404,7 @@ ok( $util->files_diff( f1 => $rwtest, f2 => $backup, debug => 0 ),
     'files_diff' );
 
 # make it use md5 checksums to compare
-$backup = $util->file_archive( file => $rwtest, debug => 0 );
+$backup = $util->file_archive( $rwtest, debug => 0 );
 ok( !$util->files_diff(
         f1    => $rwtest,
         f2    => $backup,
@@ -444,8 +416,7 @@ ok( !$util->files_diff(
 
 # now we change one of the files, and this time they should be different
 sleep 1;
-ok( $util->file_write(
-        file   => $rwtest,
+ok( $util->file_write( $rwtest,
         lines  => ["extra junk"],
         debug  => 0,
         append => 1
@@ -513,9 +484,14 @@ if ( eval "require $mod" ) {
     #cmp_ok( $list[6], '==', `$date '+%S'`, 'get_the_date seconds');
 
     @list = $util->get_the_date( bump => 1, debug => 0 );
-    cmp_ok( $list[0], '!=', `$date '+%d'`, "get_the_date day: $list[0]" );
-    if ( $list[0] < 28 ) {
-        cmp_ok( $list[1], '==', `$date '+%m'`, "get_the_date month: $list[1]" );
+    cmp_ok( $list[0], '!=', `$date '+%d'`, 'get_the_date day' );
+# if today is the first day of the month
+    if ( `$date '+%d'` == 1 ) {
+# then yesterdays month will not the same as this month
+        cmp_ok( $list[1], '!=', `$date '+%m'`, 'get_the_date month' );
+    }
+    else {
+        cmp_ok( $list[1], '==', `$date '+%m'`, 'get_the_date month' );
     }
     cmp_ok( $list[2], '==', `$date '+%Y'`, 'get_the_date year' );
     cmp_ok( $list[4], '==', `$date '+%H'`, 'get_the_date hour' );
@@ -528,7 +504,7 @@ else {
 # graceful_exit
 
 # install_if_changed
-$backup = $util->file_archive( file => $rwtest, debug => 0, fatal => 0 );
+$backup = $util->file_archive( $rwtest, debug => 0, fatal => 0 );
 
 # call it the new way
 ok( $util->install_if_changed(
@@ -576,11 +552,8 @@ my $process_that_exists
     : lc($OSNAME) eq 'freebsd' ? 'cron'  
     : 'init';      # init does not run in a freebsd jail
 
-$r = $util->is_process_running($process_that_exists);
-if ( $r ) {   
-    # ignore failures
-    ok( $r, "is_process_running, $process_that_exists" ) or diag system "/bin/ps -ef; /bin/ps ax";
-};
+ok( $util->is_process_running($process_that_exists), "is_process_running, $process_that_exists" )
+   ; # or diag system "/bin/ps -ef && /bin/ps ax";
 ok( !$util->is_process_running("nonexistent"), "is_process_running, nonexistent" );
 
 # is_tainted
@@ -658,7 +631,7 @@ ok( $util->pidfile_check(
 
 # verify the contents of the file contains our PID
 my ($pid)
-    = $util->file_read( file => "${rwtest}.pid", debug => 0, fatal => 0 );
+    = $util->file_read( "${rwtest}.pid", debug => 0, fatal => 0 );
 ok( $PROCESS_ID == $pid, 'pidfile_check' );
 
 # regext_test
@@ -671,7 +644,7 @@ ok( $util->regexp_test(
 );
 
 # sources_get
-# do I really want a test script download stuff? probably not.
+# do I really want a test script downloading stuff? probably not.
 
 # source_warning
 ok( $util->source_warning( package => 'foo', debug => 0 ), 'source_warning' );
@@ -684,15 +657,16 @@ else {
     ok( !$util->sudo( debug => 0, fatal => 0 ), 'sudo' );
 }
 
+$log->dump_audit( quiet => 1 );
+$log->{last_error} = scalar @{$log->{errors}};
+
 # syscmd
 my $tmpfile = '/tmp/provision-unix-test';
 ok( $util->syscmd( "touch $tmpfile", fatal => 0, debug => 0), 'syscmd +');
 ok( ! $util->syscmd( "rm $tmpfile.nonexist", fatal => 0, debug => 0), 'syscmd -');
+ok( ! $util->syscmd( "rm $tmpfile.nonexist", fatal => 0, debug => 0, timeout=>1), 'syscmd - (w/timeout)');
 ok( $util->syscmd( "rm $tmpfile", fatal => 0, debug => 0), 'syscmd +');
-ok( $util->syscmd( "$rm $tmp/maildrop-qmail-domain",
-        fatal => 0,
-        debug => 0
-    ),
+ok( $util->syscmd( "$rm $tmp/maildrop-qmail-domain", fatal => 0, debug => 0),
     'syscmd +'
 ) if $network;
 

@@ -10,7 +10,6 @@ use Carp;
 use Params::Validate qw( :all );
 
 use lib 'lib';
-use Provision::Unix::Utility;
 
 my ( $util, $prov, $p_user );
 
@@ -30,7 +29,7 @@ sub new {
 
     $p_user = $p{user};
     $prov   = $p{prov};
-    $util   = Provision::Unix::Utility->new( prov => $prov );
+    $util   = $prov->get_util;
     return $self;
 }
 

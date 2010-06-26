@@ -1,5 +1,6 @@
 .cvsignore
 .svn
+.git
 .tar.gz
 .DS_Store
 blib

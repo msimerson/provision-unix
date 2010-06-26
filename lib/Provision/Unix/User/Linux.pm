@@ -38,9 +38,7 @@ sub new {
     bless( $self, $class );
 
     $prov->audit("loaded User/Linux");
-
-    require Provision::Unix::Utility;
-    $util = Provision::Unix::Utility->new( prov => $prov );
+    $util = $prov->get_util;
     return $self;
 }
 
@@ -333,7 +331,7 @@ sub set_password {
         -f $pass_file or return $prov->error( "could not find password file", fatal => $fatal );
     };
 
-    my @lines = $util->file_read( file => $pass_file, fatal => $fatal, debug => 0 );
+    my @lines = $util->file_read( $pass_file, fatal => $fatal, debug => 0 );
     my $entry = grep { /^$username:/ } @lines;
     $entry or return $prov->error( "could not find user '$username' in $pass_file!", fatal => $fatal);
 
@@ -342,11 +340,11 @@ sub set_password {
     foreach ( @lines ) {
         s/$username\:.*?\:/$username\:$crypted\:/ if m/^$username\:/;
     };
-    $util->file_write( file => $pass_file, lines => \@lines, debug => 0, fatal => 0)
+    $util->file_write( $pass_file, lines => \@lines, debug => 0, fatal => 0)
         or $prov->error("failed to update password for $username", fatal => $fatal);
 
     if ( $p{ssh_key} ) {
-        @lines = $util->file_read( file => '/etc/passwd', debug => 1, fatal => $fatal );
+        @lines = $util->file_read( '/etc/passwd', debug => 1, fatal => $fatal );
         ($entry) = grep { /^$username:/ } @lines;
         my $homedir = (split(':', $entry))[5];
         $homedir && -d $homedir or 

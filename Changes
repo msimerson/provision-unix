@@ -2,6 +2,7 @@ Revision history for Provision-Unix
 
 0.99 
   - added syntax checking for all modules in lib as part of 'make test'
+  - synced Utility.pm with Mail::Toaster
 
 0.98 Jun 23, 2010
   - fixed syntax error in OpenVZ module

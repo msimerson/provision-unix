@@ -37,9 +37,7 @@ sub new {
     $prov = $p{prov};
     $user = $p{user};
     $prov->audit("loaded User/FreeBSD");
-
-    require Provision::Unix::Utility;
-    $util = Provision::Unix::Utility->new( prov => $prov );
+    $util = $prov->get_util;
     return $self;
 }
 
@@ -76,8 +74,7 @@ sub create {
     $user->{username} = $username;
     $user->_is_valid_username() or return;
 
-    my $bak = $util->file_archive(
-        file  => "/etc/master.passwd",
+    my $bak = $util->file_archive( "/etc/master.passwd",
         fatal => 0,
         debug => 0,
     );
@@ -190,8 +187,7 @@ sub destroy {
 ### TODO
     # this would be a good time to archive the user if desired.
 
-    my $bak = $util->file_archive(
-        file  => "/etc/master.passwd",
+    my $bak = $util->file_archive( "/etc/master.passwd",
         fatal => $p{fatal},
         debug => $p{debug},
     );
@@ -246,8 +242,7 @@ sub destroy_group {
         );
     }
 
-    my $bak = $util->file_archive(
-        file  => "/etc/group",
+    my $bak = $util->file_archive( "/etc/group",
         fatal => $p{fatal},
         debug => $p{debug},
     );
@@ -324,7 +319,7 @@ sub verify_master_passwd {
                 print
                     "verify_master_passwd: WARNING: new $passwd size ($new) is not larger than $old and we expected it to $change.\n"
                     if $debug;
-                $util->file_archive( file => "$passwd.bak" );
+                $util->file_archive( "$passwd.bak" );
                 $r{'error_code'} = 500;
                 $r{'error_desc'}
                     = "new $passwd size ($new) is not larger than $old and we expected it to $change.\n";
@@ -353,7 +348,7 @@ sub verify_master_passwd {
                 $r{'error_code'} = 500;
                 $r{'error_desc'}
                     = "new $passwd size ($new) is not smaller than $old and we expected it to $change.\n";
-                $util->file_archive( file => "$passwd.bak" );
+                $util->file_archive( "$passwd.bak" );
                 return \%r;
             }
         }

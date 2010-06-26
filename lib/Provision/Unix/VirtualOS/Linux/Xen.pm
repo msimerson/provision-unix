@@ -669,8 +669,7 @@ sub create_console_user {
     };
 
     foreach ( qw/ .bashrc .bash_profile / ) {
-        $util->file_write( 
-            file  => "$ve_home/$_", 
+        $util->file_write( "$ve_home/$_", 
             lines => [ "/usr/bin/sudo /usr/sbin/xm console $ve_name", 'exit' ],
             fatal => 0,
             debug => 0,
@@ -680,8 +679,7 @@ sub create_console_user {
     $log->audit("installed console login script");
 
     if ( ! `grep '^$username' /etc/sudoers` ) {
-        $util->file_write(
-            file   => '/etc/sudoers',
+        $util->file_write( '/etc/sudoers',
             lines  => [ "$username  ALL=(ALL) NOPASSWD: /usr/sbin/xm console $ve_name" ],
             append => 1,
             mode   => '0440',
@@ -690,8 +688,7 @@ sub create_console_user {
         )
         or $log->error( "failed to update sudoers for console login");
 
-        $util->file_write(
-            file   => '/etc/sudoers.local',
+        $util->file_write( '/etc/sudoers.local',
             lines  => [ "$username  ALL=(ALL) NOPASSWD: /usr/sbin/xm console $ve_name" ],
             append => 1,
             fatal  => 0,
@@ -976,8 +973,7 @@ EOCONF
     #nics       =
     #dhcp       =
 
-    $util->file_write( 
-        file => $config_file, 
+    $util->file_write( $config_file, 
         lines => [$config],
         debug => 0,
         fatal => 0,
@@ -992,11 +988,7 @@ sub get_config {
 
     my $config_file = $self->get_ve_config_path();
 
-    return $util->file_read( 
-        file => $config_file, 
-        debug => 0,
-        fatal => 0,
-    ) 
+    return $util->file_read( $config_file, debug => 0, fatal => 0 ) 
     or return $log->error("unable to read VE config file", fatal => 0);
 };
 
@@ -1579,8 +1571,7 @@ EOFSTAB
 ;
 
     my $ve_home = $self->get_ve_home();
-    $util->file_write( 
-        file => "$ve_home/mnt/etc/fstab", 
+    $util->file_write( "$ve_home/mnt/etc/fstab", 
         lines => [ $contents ],
         debug => 0,
         fatal => 0,
@@ -1632,7 +1623,7 @@ sub set_ips {
     foreach ( @ips ) { $ip_list .= " $_"; };
     my $mac      = $self->get_mac_address();
 
-    my @lines = $util->file_read( file => $config_file, debug => 0, fatal => 0) 
+    my @lines = $util->file_read( $config_file, debug => 0, fatal => 0) 
         or return $log->error("could not read $config_file", fatal => 0);
 
     foreach my $line ( @lines ) {
@@ -1641,7 +1632,7 @@ sub set_ips {
         $mac = $1 if $1;   # use the existing mac if possible
         $line = "vif        = ['ip=$ip_list, vifname=vif${ctid},  mac=$mac']";
     };
-    $util->file_write( file => $config_file, lines => \@lines, fatal => 0 )
+    $util->file_write( $config_file, lines => \@lines, fatal => 0 )
         or return $log->error( "could not write to $config_file", fatal => 0);
 
     return 1;
@@ -1662,8 +1653,7 @@ sub set_libc {
         };
         return $log->error("could not create $libdir", fatal => 0) 
             if ! -d "$fs_root/$libdir";
-        $util->file_write( 
-            file  => "$fs_root/$libfile", 
+        $util->file_write( "$fs_root/$libfile", 
             lines => [ 'hwcap 0 nosegneg' ], 
             debug => 0 , fatal => 0 )
             or return $log->error("could not install $libfile", fatal => 0);
@@ -1756,7 +1746,7 @@ sub set_password_root {
     $user ||= Provision::Unix::User->new( prov => $prov );
 
     my $pass_file = $self->get_ve_passwd_file() or return;
-    my @lines     = $util->file_read( file => $pass_file, fatal => 0 );
+    my @lines     = $util->file_read( $pass_file, fatal => 0 );
 
     grep { /^root:/ } @lines 
         or return $log->error( "\tcould not find root password entry in $pass_file!", fatal => 0);
@@ -1767,7 +1757,7 @@ sub set_password_root {
         s/root\:.*?\:/root\:$crypted\:/ if m/^root\:/;
     };
 
-    $util->file_write( file => $pass_file, lines => \@lines, debug => $debug, fatal => 0 ) or return;
+    $util->file_write( $pass_file, lines => \@lines, debug => $debug, fatal => 0 ) or return;
     $log->audit( "VE root password set." );
     return 1;
 };

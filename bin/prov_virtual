@@ -9,11 +9,10 @@ use Pod::Usage;
 
 use lib 'lib';
 use Provision::Unix;
-use Provision::Unix::Utility;
 use Provision::Unix::VirtualOS;
 
 my $prov = Provision::Unix->new( debug => 0 );
-my $util = Provision::Unix::Utility->new( prov => $prov, debug => 0);
+my $util = $prov->get_util;
 
 Getopt::Long::GetOptions(
     'action=s'        => \my $action,

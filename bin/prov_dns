@@ -14,10 +14,10 @@ use Provision::Unix::DNS;
 use Provision::Unix::Utility;
 
 my $prov = Provision::Unix->new( debug => 0 );
-my $dns  = Provision::Unix::DNS->new( prov => $prov );
-my $util = Provision::Unix::Utility->new( prov => $prov, debug => 0);
+my $dns  = $prov->get_dns;
+my $util = $prov->get_util;
 
-# process command line options
+# command line option processing
 Getopt::Long::GetOptions(
 
     'action=s' => \my $action,

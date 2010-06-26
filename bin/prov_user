@@ -10,10 +10,10 @@ use Pod::Usage;
 use lib 'lib';
 use Provision::Unix;
 use Provision::Unix::User;
-use Provision::Unix::Utility;
 
 my $prov = Provision::Unix->new( debug => 0 );
 my $user = Provision::Unix::User->new( prov => $prov, debug => 0 );
+my $util = $prov->get_util;
 
 # process command line options
 Getopt::Long::GetOptions(
@@ -44,8 +44,6 @@ die "\n$0 must be run as root!\n\n" if !$EFFECTIVE_USER_ID == 0;
 my $conf = $prov->{config};
 $user->{debug} || 0;   # so it's not undef
 
-my $util
-    = Provision::Unix::Utility->new( prov => $prov, debug => $user->{debug} );
 
 my %actions = map { $_ => 1 }
     qw/ create destroy suspend restore show repair test creategroup destroygroup modify /;

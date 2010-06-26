@@ -712,7 +712,7 @@ EO_VE_CUSTOM
     my $conf_file = $self->get_ve_config_path();
 
 # install config file
-    $util->file_write( file => $conf_file, lines => [ $result ], debug => 0 );
+    $util->file_write( $conf_file, lines => [ $result ], debug => 0 );
     $prov->audit("updated config file $conf_file");
 };
 
@@ -722,12 +722,8 @@ sub get_config {
 
     my $config_file = $self->get_ve_config_path();
 
-    return $util->file_read( 
-        file => $config_file, 
-        debug => 0,
-        fatal => 0,
-        ) 
-    or return $prov->error("unable to read VE config file", fatal => 0);
+    return $util->file_read( $config_file, debug => 0, fatal => 0,) 
+        or return $prov->error("unable to read VE config file", fatal => 0);
 };
 
 sub get_ve_config_path {
@@ -905,8 +901,7 @@ sub set_config {
     my $ctid = $vos->{name};
     my $config_file = $prov->{etc_dir} . "/$ctid.conf";
 
-    return $util->file_write(
-        file  => $config_file,
+    return $util->file_write( $config_file,
         lines => [ $config ],
         debug => 0,
     );
@@ -919,8 +914,7 @@ sub set_config_default {
     my $config_file = $prov->{etc_dir} . "/ve-default.conf-sample";
     return if -f $config_file;
 
-    return $util->file_write(
-        file  => $config_file,
+    return $util->file_write( $config_file,
         lines => [ _default_config() ],
         debug => 0,
         fatal => 0,

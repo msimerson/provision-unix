@@ -9,9 +9,6 @@ use Carp;
 use English qw( -no_match_vars );
 use Params::Validate qw( :all );
 
-use lib 'lib';
-use Provision::Unix::Utility;
-
 my ( $prov, $util, $web );
 
 sub new {
@@ -35,7 +32,7 @@ sub new {
             debug => $p{debug},
         );
     };
-    $util = Provision::Unix::Utility->new( prov => $prov );
+    $util = $prov->get_util;
 
     my $self = {};
     bless( $self, $class );
@@ -146,15 +143,14 @@ sub create {
 
     if ( -f $vhosts_conf ) {
         $prov->audit("appending to file: $vhosts_conf");
-        $util->file_write(
-            file   => $vhosts_conf,
+        $util->file_write( $vhosts_conf,
             lines  => \@lines,
             append => 1,
         );
     }
     else {
         $prov->audit("writing to file: $vhosts_conf");
-        $util->file_write( file => $vhosts_conf, lines => \@lines );
+        $util->file_write( $vhosts_conf, lines => \@lines );
     }
 
     $self->restart($vals);
@@ -309,15 +305,14 @@ sub enable {
     # write vhost definition to a file
     if ( -f $vhosts_conf ) {
         print "appending to file: $vhosts_conf\n" if $vals->{'debug'};
-        $util->file_write(
-            file   => $vhosts_conf,
+        $util->file_write( $vhosts_conf,
             lines  => $match,
             append => 1
         );
     }
     else {
         print "writing to file: $vhosts_conf\n" if $vals->{'debug'};
-        $util->file_write( file => $vhosts_conf, lines => $match );
+        $util->file_write( $vhosts_conf, lines => $match );
     }
 
     $self->restart($vals);
@@ -358,7 +353,7 @@ sub disable {
 
     print "Disabling: \n" . join( "\n", @$match ) . "\n";
 
-    $util->file_write( file => "$vhosts_conf.new", lines => $new );
+    $util->file_write( "$vhosts_conf.new", lines => $new );
 
     # write out the .disabled file (append if existing)
     if ( -f "$vhosts_conf.disabled" ) {
@@ -375,8 +370,7 @@ sub disable {
             # if not, append it
             print "appending to file: $vhosts_conf.disabled\n"
                 if $vals->{'debug'};
-            $util->file_write(
-                file   => "$vhosts_conf.disabled",
+            $util->file_write( "$vhosts_conf.disabled",
                 lines  => $match,
                 append => 1,
             );
@@ -384,8 +378,7 @@ sub disable {
     }
     else {
         print "writing to file: $vhosts_conf.disabled\n" if $vals->{'debug'};
-        $util->file_write(
-            file  => "$vhosts_conf.disabled",
+        $util->file_write( "$vhosts_conf.disabled",
             lines => $match,
         );
     }
@@ -455,8 +448,8 @@ sub destroy {
     # we'll write out @new and @drop and compare them to make sure
     # the two total the same size as the original
 
-    $util->file_write( file => "$vhosts_conf.new",  lines => $new );
-    $util->file_write( file => "$vhosts_conf.drop", lines => $drop );
+    $util->file_write( "$vhosts_conf.new",  lines => $new );
+    $util->file_write( "$vhosts_conf.drop", lines => $drop );
 
     if ( ( ( -s "$vhosts_conf.new" ) + ( -s "$vhosts_conf.drop" ) )
         == -s $vhosts_conf )
@@ -625,7 +618,7 @@ sub get_match {
     $vhosts_conf .= ".disabled" if $vals->{'disabled'};
 
     print "reading in the vhosts file $vhosts_conf\n" if $vals->{'debug'};
-    my @lines = $util->file_read( file => $vhosts_conf);
+    my @lines = $util->file_read( $vhosts_conf);
 
     my ( $in, $match, @new, @drop );
 LINE: foreach my $line (@lines) {
