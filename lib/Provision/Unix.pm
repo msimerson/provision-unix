@@ -1,6 +1,6 @@
 package Provision::Unix;
 
-our $VERSION = '0.98';
+our $VERSION = '0.99';
 
 use warnings;
 use strict;
@@ -46,7 +46,7 @@ sub new {
         $self->{config} = Config::Tiny->read( $config );
     }
     else {
-        warn "could not find provision.conf. Consider installing it in your local etc directory.\n";
+        warn "could not find $file. Installing it in your local etc directory.\n";
     };
 
     return $self;

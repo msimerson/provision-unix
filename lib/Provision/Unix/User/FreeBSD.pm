@@ -87,7 +87,7 @@ sub create {
     $pwcmd .= "-d $homedir "    if $homedir;
     $pwcmd .= "-u $uid "        if $uid;
     $pwcmd .= "-g $gid "        if $gid;
-    $pwcmd .= "-c $p{'gecos'} " if $p{'gecos'};
+    $pwcmd .= "-c '$p{'gecos'}' " if $p{'gecos'};
     $pwcmd .= "-u 89 -g 89 -c Vpopmail-Master "
         if ( $username eq "vpopmail" );
     $pwcmd .= "-n $username -d /nonexistent -c Clam-AntiVirus "

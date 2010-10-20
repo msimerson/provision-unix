@@ -1,8 +1,9 @@
 Revision history for Provision-Unix
 
-0.99 
+0.99 Oct 20, 2010
   - added syntax checking for all modules in lib as part of 'make test'
   - synced Utility.pm with Mail::Toaster
+  - quoted gecos field in P:U:U:FreeBSD - thx Alan Ferrency
 
 0.98 Jun 23, 2010
   - fixed syntax error in OpenVZ module
