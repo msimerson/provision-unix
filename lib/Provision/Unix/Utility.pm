@@ -50,7 +50,7 @@ sub ask {
     my $question = shift;
     my %p = validate(
         @_,
-        {   default  => { type => SCALAR,  optional => 1 },
+        {   default  => { type => SCALAR|UNDEF, optional => 1 },
             timeout  => { type => SCALAR,  optional => 1 },
             password => { type => BOOLEAN, optional => 1, default => 0 },
             test_ok  => { type => BOOLEAN, optional => 1 },
@@ -2436,7 +2436,7 @@ Unless otherwise mentioned, all methods accept two additional parameters:
   Perl.
   Scalar::Util -  built-in as of perl 5.8
 
-Almost nothing else. A few of the methods do require certian things, like archive_expand requires tar and file. But in general, this package (Mail::Toaster::Utility) should run flawlessly on any UNIX-like system. Because I recycle this package in other places (not just Mail::Toaster), I avoid creating dependencies here.
+Almost nothing else. A few of the methods do require certain things, like archive_expand requires tar and file. But in general, this package (Provision::Unix::Utility) should run flawlessly on any UNIX-like system. Because I recycle this package in other places (not just Provision::Unix), I avoid creating dependencies here.
 
 =head1 METHODS
 
@@ -2448,9 +2448,9 @@ Almost nothing else. A few of the methods do require certian things, like archiv
 To use any of the methods below, you must first create a utility object. The methods can be accessed via the utility object.
 
   ############################################
-  # Usage      : use Mail::Toaster::Utility;
-  #            : my $util = Mail::Toaster::Utility->new;
-  # Purpose    : create a new Mail::Toaster::Utility object
+  # Usage      : use Provision::Unix::Utility;
+  #            : my $util = Provision::Unix::Utility->new;
+  # Purpose    : create a new Provision::Unix::Utility object
   # Returns    : a bona fide object
   # Parameters : none
   ############################################
