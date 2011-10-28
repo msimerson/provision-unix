@@ -1,11 +1,9 @@
 package Provision::Unix::VirtualOS::Xen::Config;
 
-our $VERSION = 0.3;
+our $VERSION = 0.4;
 
 use strict;
 use warnings;
-
-use Switch;
 
 sub new {
     my $class = shift;
@@ -57,64 +55,57 @@ sub parse_config {
 sub clone_ref {
     my ($obj) = @_;
     my $return;
-    switch(ref $obj){
-        case 'SCALAR' {
+    if    ( ref $obj eq 'SCALAR' ){
             my $tmp = $$obj;
             $return = \$tmp;
-          }
-        case 'ARRAY' {
-            $return = [];
-            for(@$obj){
-                push @$return, clone_ref($_);
-            };
-          }
-        case 'HASH' {
+    }
+    elsif ( ref $obj eq 'ARRAY' ) {
+        $return = [];
+        for(@$obj){
+            push @$return, clone_ref($_);
+        };
+    }
+    elsif ( ref $obj eq 'HASH' ) {
             $return = {};
             for(keys %$obj){
                 $return->{$_} = clone_ref($obj->{$_});
             };
-          }
-        else {
-            $return = $obj;
-          }
+    }
+    else {
+        $return = $obj;
     };
     return $return;
 };
 
 sub parse_value {
     my ($raw_value) = @_;
-    switch($raw_value){
-        case m/^\[/ {
-            #array
-            my $value = $raw_value;
-            $value =~ s/^\[\s*//;
-            $value =~ s/\s*\]$//;
-            my $values = [];
-            for my $item (split(/'\s*,\s*'/, $value)){
-                $item =~ s/^'//;
-                $item =~ s/'$//;
-                my $subconfig = parse_value($item);
-                unless(defined $subconfig){
-                    push @{$values}, $item;
-                } else {
-                    push @{$values}, $subconfig;
-                };
+    if ( $raw_value =~ m/^\[/ ) {  #array
+        my $value = $raw_value;
+        $value =~ s/^\[\s*//;
+        $value =~ s/\s*\]$//;
+        my $values = [];
+        for my $item (split(/'\s*,\s*'/, $value)){
+            $item =~ s/^'//;
+            $item =~ s/'$//;
+            my $subconfig = parse_value($item);
+            unless(defined $subconfig){
+                push @{$values}, $item;
+            } else {
+                push @{$values}, $subconfig;
             };
-            return $values;
-          }
-        case m/^'/ {
-            #string
-            my $value = $raw_value;
-            $value =~ s/^'//;
-            $value =~ s/'$//;
-            return $value;
-          }
-        case m/^\d/ {
-            #integer
-            return $raw_value;
-          }
-        case m/^\w+=/ {
-            #hash
+        };
+        return $values;
+    }
+    elsif ( $raw_value =~ m/^'/ ) { #string
+        my $value = $raw_value;
+        $value =~ s/^'//;
+        $value =~ s/'$//;
+        return $value;
+    }
+    elsif ( $raw_value =~ m/^\d/ ) { #integer
+        return $raw_value;
+        }
+    elsif ( $raw_value =~ m/^\w+=/ ) { #hash
             my $hash_ref = {};
             for my $item (split(/\s*,\s*/, $raw_value)){
                 my ($name, $value) = split(/=/, $item);
@@ -125,44 +116,41 @@ sub parse_value {
                 }
             }
             return $hash_ref;
-          }
-        else {
-            return;
-        }
-   };
+    }
+    else {
+        return;
+    }
 }
 
 sub join_value {
     my ($item) = @_;
-    switch(ref $item){
-        case "" {
-            if($item =~ /^\d+$/){
-                return "$item";
-            } else {
-                return "'$item'"; 
-            }
-          }
-        case "ARRAY" {
-            my @processed_item;
-            for(0..$#{$item}){
-                push @processed_item, join_value($item->[$_]);
-            };
-            return "[" . join(", ", @processed_item) . "]";
-          }
-        case "HASH" {
-            my @processed_item;
-            for my $key ( keys %{$item} ){
-                if(ref $item->{$key} eq 'ARRAY'){
-                    push @processed_item, "$key=".join(" ", @{$item->{$key}});
-                } else {
-                    push @processed_item, "$key=$item->{$key}";
-                };
-            };
-            return "'".join(", ", @processed_item)."'";
-          }
-        else {
-            return undef;
+    if ( ref $item eq "" ) {
+        if($item =~ /^\d+$/){
+            return "$item";
+        } else {
+            return "'$item'"; 
         }
+    }
+    elsif ( ref $item eq "ARRAY" ) {
+        my @processed_item;
+        for(0..$#{$item}){
+            push @processed_item, join_value($item->[$_]);
+        };
+        return "[" . join(", ", @processed_item) . "]";
+    }
+    elsif ( ref $item eq "HASH" ) {
+        my @processed_item;
+        for my $key ( keys %{$item} ){
+            if(ref $item->{$key} eq 'ARRAY'){
+                push @processed_item, "$key=".join(" ", @{$item->{$key}});
+            } else {
+                push @processed_item, "$key=$item->{$key}";
+            };
+        };
+        return "'".join(", ", @processed_item)."'";
+    }
+    else {
+        return undef;
     }
 }
 
