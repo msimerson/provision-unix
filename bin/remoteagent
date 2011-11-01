@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 
-eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
-    if 0; # not running under some shell
 use strict;
 use warnings;
+
+## no critic
+eval 'exec /usr/bin/perl -S $0 ${1+"$@"}' if 0; # not running under some shell
+## use critic
 
 #use Data::Dumper;
 use IO::File;
@@ -182,7 +184,9 @@ sub do_prov_call {
 
     my %result = ( id => $req->{id} );
 
+    ## no critic
     eval "require $pkg;";
+    ## use critic
     die {
         type    => 'dispatch',
         message => "Error loading provisioning module $pkg",
