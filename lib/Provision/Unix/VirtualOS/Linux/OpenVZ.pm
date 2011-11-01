@@ -1,9 +1,10 @@
 package Provision::Unix::VirtualOS::Linux::OpenVZ;
+# ABSTRACT: provision a linux VPS using openvz
+
+use strict;
+use warnings;
 
 our $VERSION = '0.51';
-
-use warnings;
-use strict;
 
 use English qw( -no_match_vars );
 use File::Copy;
@@ -486,88 +487,6 @@ sub reinstall {
     return $self->create();
 }
 
-sub transition {
-
-    my $self = shift;
-    my ($prov, $vos, $util) = ($self->{prov}, $self->{vos}, $self->{util});
-
-    my $ctid = $vos->{name};
-    $prov->audit("transitioning $ctid");
-
-    return $prov->error( "$ctid does not exist",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-    ) if ! $self->is_present();
-
-    my $config = $self->get_ve_config_path();
-    if ( ! -e $config && -e "$config.transition" ) {
-        $prov->audit("\t$ctid is already transitioned");
-    };
-
-    if ( !-e $config ) {
-        return $prov->error( "configuration file ($config) for $ctid does not exist",
-            fatal => $vos->{fatal},
-            debug => $vos->{debug},
-        );
-    }
-
-    $self->stop()    if $self->is_running( refresh => 0 );
-    $self->unmount() if $self->is_mounted( refresh => 0 );
-
-    move( $config, "$config.transition" )
-        or return $prov->error( "unable to move file '$config': $!",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-        );
-
-    $prov->audit( "virtual $ctid is transitioned." );
-
-    return 1;
-}
-
-sub untransition {
-    my $self = shift;
-    my ($prov, $vos, $util) = ($self->{prov}, $self->{vos}, $self->{util});
-
-    my $ctid = $vos->{name};
-    $prov->audit("enabling $ctid");
-
-    return $prov->error( "$ctid does not exist",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-    ) if ! $self->is_present();
-
-    my $config = $self->get_ve_config_path();
-    if ( -e $config ) {
-        $prov->audit("\t$ctid is already enabled");
-        return $self->start();
-    };
-
-    my $suspended_config = "$config.transition";
-    if ( !-e $suspended_config ) {
-        return $prov->error( "configuration file ($suspended_config) for $ctid does not exist",
-            fatal => $vos->{fatal},
-            debug => $vos->{debug},
-        );
-    }
-
-    my $ct_dir = $self->get_ve_home();
-    if ( !-e $ct_dir ) {
-        return $prov->error( "VE directory '$ct_dir' for $ctid does not exist",
-            fatal => $vos->{fatal},
-            debug => $vos->{debug},
-        );
-    }
-
-    move( $suspended_config, $config )
-        or return $prov->error( "unable to move file '$config': $!",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-        );
-
-    return $self->start();
-}
-
 sub console {
     my $self = shift;
     my ($prov, $vos, $util) = ($self->{prov}, $self->{vos}, $self->{util});
@@ -816,10 +735,6 @@ sub get_status {
             $exists++;
             $ve_info{state} = 'suspended';
         }
-        elsif ( -e "$config.transition" ) {
-            $exists++;
-            $ve_info{state} = 'transitioned';
-        }
         else {
             $ve_info{state} = 'non-existent';
         };
@@ -869,13 +784,13 @@ sub get_status {
 
     $self->{status}{$name} = \%ve_info;
     return \%ve_info;
+}
 
-    sub _run_state {
-        my $raw = shift;
-        return $raw =~ /running/ ? 'running'
-             : $raw =~ /stopped/ ? 'shutdown'
-             :                     $raw;
-    }
+sub _run_state {
+    my $raw = shift;
+    return $raw =~ /running/ ? 'running'
+            : $raw =~ /stopped/ ? 'shutdown'
+            :                     $raw;
 }
 
 sub get_fs_root {
@@ -1198,7 +1113,7 @@ EOCONFIG
 };
 
 
-1
+1;
 
 __END__
 

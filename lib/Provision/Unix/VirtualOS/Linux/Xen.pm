@@ -1020,7 +1020,6 @@ sub get_status {
     my $config_file = $self->get_ve_config_path();
     if ( ! -e $config_file ) {
         return { state => 'disabled' } if -e "$config_file.suspend";
-        return { state => 'transitioned' } if -e "$config_file.transition";
 
         $log->audit( "\tmissing config file $config_file" );
         return { state => 'broken' };

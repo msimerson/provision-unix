@@ -1,12 +1,13 @@
 package Provision::Unix::VirtualOS::Linux::Virtuozzo;
+# ABSTRACT: provision a linux VPS using Virtuozzo
+
+use strict;
+use warnings;
 
 use lib 'lib';
-use base Provision::Unix::VirtualOS::Linux::OpenVZ;
+use base 'Provision::Unix::VirtualOS::Linux::OpenVZ';
 
 our $VERSION = '0.13';
-
-use warnings;
-use strict;
 
 use English qw( -no_match_vars );
 use File::Copy;
@@ -89,7 +90,7 @@ sub create {
     $cmd .= " --pkgset $pkgset";
     # $cmd .= " --ostemplate $template";
     
-    my @configs = </etc/vz/conf/ve-*.conf-sample>;
+    my @configs = glob("/etc/vz/conf/ve-*.conf-sample");
     no warnings;
     my @sorted = 
         sort { ( $b =~ /(\d+)/)[0] <=> ($a =~ /(\d+)/)[0] } 
