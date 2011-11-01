@@ -1,9 +1,10 @@
 package Provision::Unix;
+# ABSTRACT: provision accounts on unix systems
 
-our $VERSION = '0.99';
-
-use warnings;
 use strict;
+use warnings;
+
+our $VERSION = '1.01';
 
 use Carp;
 use Config::Tiny;
@@ -197,8 +198,8 @@ sub get_dns {
     my $self = shift;
     return $self->{dns} if ref $self->{dns};
     require Provision::Unix::DNS;
-    $self->{util} = Provision::Unix::DNS->new( 
-            'log' => $self, 
+    $self->{dns} = Provision::Unix::DNS->new( 
+            prov  => $self, 
             debug => $self->{debug},
             );
     return $self->{dns};
@@ -485,10 +486,6 @@ Example:
 
 prints and returns the last error encountered.
 
-=head1 AUTHOR
-
-Matt Simerson, <msimerson@cpan.org>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-unix-provision at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Provision-Unix>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
@@ -522,11 +519,6 @@ L<http://cpanratings.perl.org/d/Provision-Unix>
 L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
-
-=head1 COPYRIGHT & LICENSE
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

@@ -1,9 +1,10 @@
 package Provision::Unix::VirtualOS::FreeBSD::Ezjail;
+# ABSTRACT: provision freebsd jails using ezjail
+
+use strict;
+use warnings;
 
 our $VERSION = '0.11';
-
-use warnings;
-use strict;
 
 use English qw( -no_match_vars );
 use Params::Validate qw(:all);
@@ -94,7 +95,7 @@ sub _get_jails_root {
         ( undef, $r ) = split /=/, $r;
         return $r;
     }
-    return undef;
+    return;
 }
 
 1;

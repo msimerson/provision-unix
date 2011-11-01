@@ -1,7 +1,8 @@
 package Provision::Unix::VirtualOS;
+# ABSTRACT: Provision virtual environments (VEs)
 
-use warnings;
 use strict;
+use warnings;
 
 our $VERSION = '0.59';
 
@@ -569,7 +570,7 @@ sub get_template_list {
                 debug  => $p{debug},
             );
 
-        my @template_names = <$template_dir/*.tar.gz>;
+        my @template_names = glob("$template_dir/*.tar.gz");
         foreach my $template ( @template_names ) {
             ($template) = $template =~ /\/([\w\.\-]+)\.tar\.gz$/;
             push @templates, { name => $template };
@@ -664,7 +665,8 @@ sub set_nameservers {
         }
     );
 
-    my $name              = $self->set_name( $p{name} ) if $p{name};
+    my $name;
+    $name = $self->set_name( $p{name} ) if $p{name};
     my $searchdomain      = $p{searchdomain};
     $self->{nameservers}  = $self->get_ips( $p{nameservers} ) if $p{nameservers};
     $self->{nameservers}  or die 'missing nameservers';
@@ -905,9 +907,6 @@ sub _get_virt_type_linux {
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::VirtualOS - Provision virtual environments (VEs)
 
 =head1 SYNOPSIS
 
@@ -1242,10 +1241,6 @@ unmounts a snapshot.
 
 returns an array representing with each line in the VE config file being an element in the array.
 
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-unix-provision-virtualos at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Provision-Unix>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.  
@@ -1280,13 +1275,6 @@ L<http://search.cpan.org/dist/Provision-Unix-VirtualOS>
 
 =back
 
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008-2010 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

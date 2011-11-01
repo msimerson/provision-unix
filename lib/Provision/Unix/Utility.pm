@@ -1,9 +1,10 @@
 package Provision::Unix::Utility;
-
-our $VERSION = '5.29';
+# ABSTRACT: utility subroutines for sysadmin tasks
 
 use strict;
 use warnings;
+
+our $VERSION = '5.30';
 
 use Cwd;
 use Carp;
@@ -31,7 +32,9 @@ sub new {
     if ( ! $log ) {
         my @bits = split '::', $class; pop @bits;
         my $parent_class = join '::', grep { defined $_ } @bits;
+        ## no critic
         eval "require $parent_class";
+        ## use critic
         $log = $parent_class->new();
     };
 
@@ -394,7 +397,7 @@ sub cwd_source_dir {
 
 sub _try_mkdir {
     my ( $dir ) = @_;
-    mkpath( $dir, 0, 0755) 
+    mkpath( $dir, 0, oct(755)) 
         or return $log->error( "mkdir $dir failed: $!");
     $log->audit( "created $dir");
     return 1;
@@ -516,7 +519,9 @@ sub file_get {
     my $fatal = $p{fatal};
 
     my ($ua, $response);
+## no critic
     eval "require LWP::Simple";
+## use critic
     return $self->file_get_system( %p ) if $EVAL_ERROR;
 
     my $uri = URI->new($url);
@@ -1519,7 +1524,7 @@ sub install_package {
         }
 
         print "installing $app\n";
-        my $portdir = </usr/ports/*/$portname>;
+        my $portdir = glob("/usr/ports/*/$portname");
 
         if ( ! -d $portdir || ! chdir $portdir ) {
             print "oops, couldn't find port $app at '$portname'\n";
@@ -1543,7 +1548,9 @@ sub install_package {
 sub install_module {
     my ($self, $module, %info) = @_;
 
+## no critic
     eval "use $module";
+## use critic
     if ( ! $EVAL_ERROR ) {
         $log->audit( "$module is already installed." );
         return 1;
@@ -1574,7 +1581,7 @@ sub install_module {
 
         print "installing $module";
 
-        my $portdir = </usr/ports/*/$portname>;
+        my $portdir = glob("/usr/ports/*/$portname");
 
         if ( $portdir && -d $portdir && chdir $portdir ) {
             print " from ports ($portdir)\n";
@@ -1604,7 +1611,9 @@ sub install_module {
 
     CPAN::Shell->install($module);
 
+## no critic
     eval "use $module";
+## use critic
     if ( ! $EVAL_ERROR ) {
         $log->audit( "$module is installed." );
         return 1;
@@ -1713,7 +1722,9 @@ sub is_interactive {
 sub is_process_running {
     my ( $self, $process ) = @_;
 
+## no critic
     eval "require Proc::ProcessTable";
+## use critic
     if ( ! $EVAL_ERROR ) {
         my $i = 0;
         my $t = Proc::ProcessTable->new();
@@ -2401,9 +2412,6 @@ sub yes_or_no {
 __END__
 
 
-=head1 NAME
-
-Provision::Unix::Utility - utility subroutines for sysadmin tasks
 
 
 =head1 SYNOPSIS
@@ -3117,16 +3125,6 @@ try creating a directory using perl's builtin mkdir.
 
 =back
 
-=head1 AUTHOR
-
-Matt Simerson (matt@tnpi.net)
-
-
-=head1 BUGS
-
-None known. Report any to author.
-
-
 =head1 TODO
 
   make all errors raise exceptions
@@ -3139,20 +3137,5 @@ None known. Report any to author.
 The following are all man/perldoc pages: 
 
  Provision::Unix 
-
-
-=head1 COPYRIGHT
-
-Copyright (c) 2003-2009, The Network People, Inc. All Rights Reserved.
-
-Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-
-Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-
-Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-
-Neither the name of the The Network People, Inc. nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 =cut

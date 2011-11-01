@@ -1,9 +1,10 @@
 package Provision::Unix::VirtualOS::Linux;
+# ABSTRACT: a framework for building virtual machines (VPS/VE/Jail)
+
+use strict;
+use warnings;
 
 our $VERSION = '0.27';
-
-use warnings;
-use strict;
 
 use File::Copy;
 use File::Path;
@@ -81,7 +82,7 @@ sub install_kernel_modules {
     return 1 if $p{test_mode};
 
     if ( -d "/boot/domU" ) {
-        my ($modules) = </boot/domU/modules*$version*>;
+        my ($modules) = glob("/boot/domU/modules*$version*");
         $modules or return $prov->error( 
             "unable to find kernel modules in /boot/domU", %std_opts);
         my $module_dir = "$fs_root/lib/modules";

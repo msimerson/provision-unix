@@ -1,5 +1,10 @@
 Revision history for Provision-Unix
 
+1.01 Nov 01, 2011
+  - remove Switch from Xen::Config
+  - Utility::ask allows undefined default to be passed in
+  - packaging changes related to switching to Dist::Zilla
+
 0.99 Oct 20, 2010
   - added syntax checking for all modules in lib as part of 'make test'
   - synced Utility.pm with Mail::Toaster

@@ -1,9 +1,10 @@
 package Provision::Unix::User;
-
-our $VERSION = '0.26';
+# ABSTRACT: provision unix accounts on Unix(like) systems!
 
 use strict;
 use warnings;
+
+our $VERSION = '0.26';
 
 use English qw( -no_match_vars );
 use File::Path;
@@ -68,7 +69,6 @@ sub create_group {
 }
 
 sub modify {
-
     my $self = shift;
     $self->{os}->modify(@_);
 }
@@ -310,7 +310,7 @@ sub install_ssh_key {
     };
 
     my $ssh_dir = "$homedir/.ssh";
-    mkpath($ssh_dir, 0, 0700) if ( ! -d $ssh_dir && ! -e $ssh_dir );
+    mkpath($ssh_dir, 0, oct(700)) if ( ! -d $ssh_dir && ! -e $ssh_dir );
     -d $ssh_dir or return $prov->error( "unable to create $ssh_dir", fatal => $fatal );
 
     my $line;
@@ -607,9 +607,6 @@ sub _is_valid_username {
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::User - Provision Unix Accounts on Unix(like) systems!
 
 =head1 SYNOPSIS
 
@@ -663,11 +660,6 @@ Installs a system group.
     $r->{error_code} == 200 ? print "success" : print $r->{error_desc}; 
 
 
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-unix-provision-user at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Provision-Unix>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
@@ -701,17 +693,6 @@ L<http://cpanratings.perl.org/d/Provision-Unix>
 L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 =cut
 

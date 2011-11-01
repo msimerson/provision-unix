@@ -40,13 +40,15 @@ ovz_template_dir       = /vz/template/cache
 ezjail_template_dir    = /usr/jails/flavours
 
 [NicTool]
-server_host = 208.75.177.121
+server_host = 127.0.0.30
 server_port = 8082
 protocol    = soap
 username    = demo@test.com
 password    = test
 nameservers = 1,2
-template    = artfarm
+template    = basic-spf
+ip          = 208.75.177.111
+mailip      = 208.75.177.101
 
 [tinydns]
 #service_dir = /var/supervise/tinydns

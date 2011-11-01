@@ -1,7 +1,8 @@
 package Provision::Unix::DNS::BIND;
+# ABSTRACT: Provision BIND DNS entries
 
-use warnings;
 use strict;
+use warnings;
 
 our $VERSION = '0.02';
 
@@ -10,9 +11,6 @@ our $VERSION = '0.02';
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::DNS::BIND - Provision BIND DNS entries
 
 =head1 SYNOPSIS
 
@@ -25,10 +23,6 @@ file, but what about database backend? subclass them? (probably)
     my $foo = Provision::Unix::DNS::BIND->new();
     ...
 
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
 
 =head1 BUGS
 
@@ -63,15 +57,6 @@ L<http://cpanratings.perl.org/d/Provision-Unix>
 L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
 
 =cut
 

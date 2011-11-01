@@ -1,7 +1,8 @@
 package Provision::Unix::Web::Lighttpd;
+# ABSTRACT: provision www virtual hosts on lighttpd
 
-use warnings;
 use strict;
+use warnings;
 
 our $VERSION = '0.02';
 

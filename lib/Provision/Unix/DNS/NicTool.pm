@@ -1,7 +1,8 @@
 package Provision::Unix::DNS::NicTool;
+# ABSTRACT: Provision NicTool DNS entries
 
-use warnings;
 use strict;
+use warnings;
 
 our $VERSION = '0.23';
 
@@ -136,10 +137,11 @@ sub create_zone {
 ## TODO
     # add zone records if $p{template}
 
+
+
 }
 
 sub create_zone_record {
-
     my $self = shift;
 
     my %p = validate(
@@ -212,7 +214,6 @@ sub create_zone_record {
 }
 
 sub get_zone {
-
     my $self = shift;
 
     my %p = validate(
@@ -262,9 +263,7 @@ sub get_zone {
 }
 
 sub delete_zone {
-
     my $self = shift;
-
     my %p = validate(
         @_,
         {   'id'   => { type => SCALAR, optional => 1 },
@@ -297,7 +296,6 @@ sub delete_zone {
 
 sub delete_zone_record {
     my $self = shift;
-
     my %p = validate(
         @_,
         {   'id'     => { type => SCALAR, optional => 1 },
@@ -331,9 +329,6 @@ sub set_fatal {
 
 1;
 
-=head1 NAME
-
-Provision::Unix::DNS::NicTool - Provision NicTool DNS entries
 
 =head1 SYNOPSIS
 
@@ -344,11 +339,6 @@ Provision DNS entries into a NicTool DNS management system using the NicTool nat
     my $dns = Provision::Unix::DNS::NicTool->new();
     ...
 
-
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
 
 =head1 BUGS
 
@@ -385,16 +375,6 @@ L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

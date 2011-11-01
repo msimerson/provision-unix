@@ -1,12 +1,13 @@
 package Provision::Unix::Web;
+# ABSTRACT: provision web hosting accounts
 
-use warnings;
 use strict;
+use warnings;
+
+our $VERSION = '0.09';
 
 use Carp;
 use Params::Validate qw( :all );
-
-our $VERSION = '0.09';
 
 use lib "lib";
 
@@ -32,7 +33,7 @@ sub new {
     $prov = $p{prov};
     $prov->audit("loaded Web");
     $self->{server} = $self->_get_server( debug => $p{debug}, fatal => $p{fatal} )
-        or return undef;
+        or return;
 
     $util = $prov->get_util;
     return $self;
@@ -97,7 +98,7 @@ sub _get_server {
         );
     }
 
-    return undef;
+    return;
 
     #    use Data::Dumper;
     #    print "\n\n";
@@ -221,9 +222,6 @@ sub check_apache_setup {
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::Web - Provision web hosting accounts
 
 =head1 SYNOPSIS
 
@@ -241,10 +239,6 @@ Provision web hosting accounts.
 
 Creates and returns a new Provision::Unix::Web object.
 
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
 
 =head1 BUGS
 
@@ -283,14 +277,5 @@ L<http://search.cpan.org/dist/Provision-Unix>
 
 
 =head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
-
 
 =cut

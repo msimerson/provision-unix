@@ -1,7 +1,8 @@
 package Provision::Unix::User::Darwin;
+# ABSTRACT: provision user accounts on Darwin systems
 
-use warnings;
 use strict;
+use warnings;
 
 our $VERSION = '0.16';
 
@@ -114,7 +115,6 @@ sub _next_uid {
 }
 
 sub _create_dscl {
-
     my $self = shift;
 
     my $user  = $p_user->{username};
@@ -162,7 +162,6 @@ sub _create_dscl {
 }
 
 sub _create_niutil {
-
     my $self  = shift;
     my $user  = $p_user->{username};
     my $debug = $p_user->{debug};
@@ -210,7 +209,6 @@ sub _create_niutil {
 }
 
 sub destroy {
-
     my $self = shift;
 
     my %p = validate(
@@ -360,10 +358,6 @@ sub exists_group {
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::User::Darwin - Provision Accounts on Darwin systems
-
 
 =head1 SYNOPSIS
 
@@ -380,10 +374,6 @@ Handles provisioning operations (create, modify, destroy) for system users on UN
 
 Creates and returns a new Provision::Unix::User::Darwin object.
 
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
 
 =head1 BUGS
 
@@ -418,17 +408,6 @@ L<http://cpanratings.perl.org/d/Provision-Unix>
 L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

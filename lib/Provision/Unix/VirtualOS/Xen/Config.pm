@@ -1,9 +1,10 @@
 package Provision::Unix::VirtualOS::Xen::Config;
-
-our $VERSION = 0.4;
+# ABSTRACT: perl interface to Xen configuration files
 
 use strict;
 use warnings;
+
+our $VERSION = 0.4;
 
 sub new {
     my $class = shift;
@@ -150,7 +151,7 @@ sub join_value {
         return "'".join(", ", @processed_item)."'";
     }
     else {
-        return undef;
+        return;
     }
 }
 
@@ -226,23 +227,20 @@ sub write {
 
     my $config = $self->{'config'};
 
+    my $CFILE;
     if(ref $arg eq 'GLOB'){
-        open(CONFIG, ">&", $arg)
-            or die "Couldn't dup\n";
+        open($CFILE, '>&', $arg) or die "Couldn't dup\n";
     } else {
-        open(CONFIG, ">", $arg)
+        open($CFILE, '>', $arg)
             or die "Couldn't open '$arg' for writing\n";
     }
-    print CONFIG $self->{'text'};
+    print $CFILE $self->{'text'};
 };
 
 1;
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::VirtualOS::Xen::Config - Perl interface to Xen configuration files
 
 =head1 SYNOPSIS
 
@@ -303,7 +301,7 @@ None at the moment
 
 =head1 AUTHOR
 
-Current maintainer is Max Vohra <max@pyrodyne.biz>
+  Max Vohra <max@pyrodyne.biz>
 
 =head1 COPYRIGHT
 

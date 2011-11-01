@@ -1,7 +1,8 @@
 package Provision::Unix::User::FreeBSD;
+# ABSTRACT: provision user accounts on FreeBSD systems
 
-use warnings;
 use strict;
+use warnings;
 
 our $VERSION = '0.10';
 
@@ -128,9 +129,7 @@ sub create {
 }
 
 sub create_group {
-
     my $self = shift;
-
     my %p = validate(
         @_,
         {   'group' => { type => SCALAR },
@@ -157,9 +156,7 @@ sub create_group {
 }
 
 sub destroy {
-
     my $self = shift;
-
     my %p = validate(
         @_,
         {   'username'  => { type => SCALAR, },
@@ -219,9 +216,7 @@ sub destroy {
 }
 
 sub destroy_group {
-
     my $self = shift;
-
     my %p = validate(
         @_,
         {   'group'     => { type => SCALAR, },
@@ -424,9 +419,6 @@ returns a boolean.
 
 1;
 
-=head1 NAME
-
-Provision::Unix::User::FreeBSD - Provision Unix Accounts on FreeBSD systems
 
 =head1 SYNOPSIS
 
@@ -444,11 +436,6 @@ Handles provisioning operations (create, modify, destroy) for system users on UN
 
 Verify that new master.passwd is the right size. I found this necessary on some versions of FreeBSD as a race condition would cause the master.passwd file to get corrupted. Now I verify that after I'm finished making my changes, the new file is a small amount larger (or smaller) than the original.
 
-
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
 
 =head1 BUGS
 
@@ -484,17 +471,6 @@ L<http://cpanratings.perl.org/d/Provision-Unix>
 L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

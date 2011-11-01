@@ -1,7 +1,8 @@
 package Provision::Unix::VirtualOS::FreeBSD::Jail;
+# ABSTRACT: provision freebsd jails
 
-use warnings;
 use strict;
+use warnings;
 
 our $VERSION = '0.07';
 

@@ -1,4 +1,5 @@
 package Provision::Unix::Web::Apache;
+# ABSTRACT: provision web hosting accounts on Apache
 
 use strict;
 use warnings;
@@ -25,7 +26,9 @@ sub new {
 
     $web  = $p{web};
     $prov = $p{prov};
+    ## no critic
     eval "require Apache::Admin::Config";
+    ## use critic
     if ( $EVAL_ERROR ) {
         return $prov->error( 'Apache::Admin::Config not installed', 
             fatal => $p{fatal}, 
@@ -680,9 +683,6 @@ LINE: foreach my $line (@lines) {
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::Web::Apache - Provision web hosting accounts on Apache
 
 =head1 SYNOPSIS
 
@@ -767,10 +767,6 @@ $apache is looked up from the contents of $conf.
 Find a vhost declaration block in the Apache config file(s).
 
 
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-unix-provision-virtualos at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Provision-Unix>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
@@ -806,14 +802,6 @@ L<http://search.cpan.org/dist/Provision-Unix>
 
 
 =head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

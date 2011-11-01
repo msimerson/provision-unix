@@ -1,4 +1,5 @@
 package Provision::Unix::DNS::tinydns;
+# ABSTRACT: Provision tinydns DNS entries
 
 use strict;
 use warnings;
@@ -100,9 +101,7 @@ sub create_zone {
 }
 
 sub create_zone_record {
-
     my $self = shift;
-
     my %p = validate(
         @_,
         {   'zone'     => { type => SCALAR },
@@ -509,9 +508,6 @@ sub characterCount {
 
 1;
 
-=head1 NAME
-
-Provision::Unix::DNS::tinydns - Provision tinydns DNS entries
 
 =head1 SYNOPSIS
 
@@ -525,10 +521,6 @@ Provision DNS entries into a tinydns DNS management system using the tinydns nat
 
 =head1 FUNCTIONS
 
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
 
 =head1 BUGS
 
@@ -569,14 +561,6 @@ L<http://search.cpan.org/dist/Provision-Unix>
 =head1 ACKNOWLEDGEMENTS
 
 some of the record generation logic was lifted from http://www.anders.com/projects/sysadmin/djbdnsRecordBuilder/
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2009 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

@@ -1,4 +1,5 @@
 package Provision::Unix::DNS;
+# ABSTRACT: generic class for common DNS tasks
 
 use strict;
 use warnings;
@@ -191,13 +192,6 @@ sub _get_server {
 1;
 __END__
 
-=head1 NAME
-
-Provision::Unix::DNS - A generic class for common DNS tasks
-
-=head1 VERSION
-
-Version 0.23
 
 =head1 SYNOPSIS
 
@@ -225,14 +219,9 @@ Support is included for NicTool via its native API and tinydns. I will leave it 
 
 =head2 get_zone
 
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
-
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-unix-provision-dns at rt.cpan.org>, or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Provision-Unix>.  I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
-
 
 
 
@@ -264,17 +253,6 @@ L<http://cpanratings.perl.org/d/Provision-Unix>
 L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut

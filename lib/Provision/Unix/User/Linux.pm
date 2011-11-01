@@ -1,9 +1,10 @@
 package Provision::Unix::User::Linux;
+# ABSTRACT: provision user accounts on Linux systems
+
+use strict;
+use warnings;
 
 our $VERSION = '0.20';
-
-use warnings;
-use strict;
 
 use English qw( -no_match_vars );
 use Carp;
@@ -14,9 +15,7 @@ use Provision::Unix;
 my ( $prov, $user, $util );
 
 sub new {
-
     my $class = shift;
-
     my %p = validate(
         @_,
         {   prov  => { type => OBJECT },
@@ -382,10 +381,6 @@ sub restart_nscd {
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::User::Linux - Provision Accounts on Linux systems
-
 =head1 SYNOPSIS
 
 Handles provisioning operations (create, modify, destroy) for system users on UNIX based operating systems.
@@ -400,10 +395,6 @@ Handles provisioning operations (create, modify, destroy) for system users on UN
 =head2 new
 
 Creates and returns a new Provision::Unix::User::Linux object.
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
 
 =head1 BUGS
 
@@ -440,15 +431,5 @@ L<http://search.cpan.org/dist/Provision-Unix>
 
 =back
 
-
-=head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright 2008 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 =cut
