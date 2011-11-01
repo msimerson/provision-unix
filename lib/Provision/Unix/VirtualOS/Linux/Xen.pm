@@ -1,9 +1,10 @@
 package Provision::Unix::VirtualOS::Linux::Xen;
+# ABSTRACT: provision a linux VPS using Xen
+
+use strict;
+use warnings;
 
 our $VERSION = '0.70';
-
-use warnings;
-use strict;
 
 #use Data::Dumper;
 use English qw( -no_match_vars );
@@ -549,90 +550,6 @@ sub reinstall {
     return $self->create();
 }
 
-sub transition {
-    my $self = shift;
-
-# TODO: this method is almost identical to disable. Remove after 10/1/2010
-    my $ctid = $vos->{name};
-    $log->audit("transitioning $ctid");
-
-    return $log->error( "$ctid does not exist",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-    ) if !$self->is_present( debug => 0 );
-
-    my $config = $self->get_ve_config_path();
-    if ( !-e $config && -e "$config.transition" ) {
-        $log->audit( "VE is already transitioned." );
-        return 1;
-    };
-
-    if ( !-e $config ) {
-        return $log->error( "configuration file ($config) for $ctid does not exist",
-            fatal => $vos->{fatal},
-            debug => $vos->{debug},
-        );
-    }
-
-    if ( $self->is_running() ) {
-        $self->stop() or return; 
-    };
-
-    move( $config, "$config.transition" )
-        or return $log->error( "\tunable to move file '$config': $!",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-        );
-
-    $log->audit("\ttransitioned $ctid.");
-    return 1;
-}
-
-sub untransition {
-    my $self = shift;
-
-# TODO: this method is almost identical to enable. Remove after 10/1/2010
-    my $ctid = $vos->{name};
-    $log->audit("restoring $ctid");
-
-    return $log->error( "$ctid does not exist",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-    ) if !$self->is_present( debug => 0 );
-
-    if ( $self->is_enabled() ) {
-        $log->audit("\t$ctid is already restored");
-        return $self->start();
-    };
-
-    my $config = $self->get_ve_config_path();
-    if ( !-e "$config.transition" ) {
-        return $log->error( "configuration file ($config.transition) for $ctid does not exist",
-            fatal => $vos->{fatal},
-            debug => $vos->{debug},
-        );
-    }
-
-    move( "$config.transition", $config )
-        or return $log->error( "\tunable to move file '$config': $!",
-        fatal   => $vos->{fatal},
-        debug   => $vos->{debug},
-        );
-
-    return $self->start();
-
-    my $arpsend = $util->find_bin( 'arpsend', fatal => 0 );
-    if ( -x $arpsend ) {
-        my @ips = grep { /vif$ctid/ } `netstat -rn`;
-        foreach my $ip ( @ips ) {
-            $prov->audit( "$arpsend -U -c2 -i $_ eth0" );
-            system "$arpsend -U -c2 -i $_ eth0";
-        };
-
-        return 1;
-    }
-}
-
 sub console {
     my $self = shift;
     my $ve_name = $self->get_ve_name();
@@ -943,10 +860,10 @@ sub gen_config {
     my $kernel_dir = $self->get_kernel_dir();
     my $kernel_version = $self->get_kernel_version();
 
-    my ($kernel) = <$kernel_dir/vmlinuz*$kernel_version*>;
-    my ($ramdisk) = <$kernel_dir/initrd*$kernel_version*>;
-    ($kernel) ||= </boot/vmlinuz-*xen>;
-    ($ramdisk) ||= </boot/initrd-*xen.img>;
+    my ($kernel) = glob("$kernel_dir/vmlinuz*$kernel_version*");
+    my ($ramdisk) = glob("$kernel_dir/initrd*$kernel_version*");
+    ($kernel) ||= glob("/boot/vmlinuz-*xen");
+    ($ramdisk) ||= glob("/boot/initrd-*xen.img");
     my $cpu = $vos->{cpu} || 1;
     my $time_dt = $prov->get_datetime_from_epoch();
 
@@ -1046,7 +963,7 @@ sub get_kernel_version {
     my $self = shift;
     return $vos->{kernel_version} if $vos->{kernel_version};
     my $kernel_dir = $self->get_kernel_dir();
-    my @kernels = <$kernel_dir/vmlinuz-*xen>;
+    my @kernels = glob("$kernel_dir/vmlinuz-*xen");
     my $kernel = $kernels[0];
     my ($version) = $kernel =~ /-([0-9\.\-]+)\./;
     return $log->error("unable to detect a xen kernel (vmlinuz-*xen) in standard locations (/boot, /boot/domU)", fatal => 0) if ! $version;
@@ -1167,19 +1084,19 @@ sub get_status {
         };
         return $self->{status}{$ctid};
     }
-
-    sub _run_state {
-        my $abbr = shift;
-        return
-              $abbr =~ /r/ ? 'running'
-            : $abbr =~ /b/ ? 'running' # blocked is a 'wait' state, poorly named
-            : $abbr =~ /p/ ? 'paused'
-            : $abbr =~ /s/ ? 'shutdown'
-            : $abbr =~ /c/ ? 'crashed'
-            : $abbr =~ /d/ ? 'dying'
-            :                undef;
-    }
 }
+
+sub _run_state {
+    my $abbr = shift;
+    return
+          $abbr =~ /r/ ? 'running'
+        : $abbr =~ /b/ ? 'running' # blocked is a 'wait' state, poorly named
+        : $abbr =~ /p/ ? 'paused'
+        : $abbr =~ /s/ ? 'shutdown'
+        : $abbr =~ /c/ ? 'crashed'
+        : $abbr =~ /d/ ? 'dying'
+        :                undef;
+};
 
 sub get_swap_image {
     my $self = shift;
@@ -1276,8 +1193,10 @@ sub get_xen_config {
     my $config_file = $self->get_ve_config_path();   # no config file, don't bother
     return if ! -f $config_file;
 
+    ## no critic
     eval "require Provision::Unix::VirtualOS::Xen::Config";  # won't load
     return if $@;
+    ## use critic
 
     my $xen_conf = Provision::Unix::VirtualOS::Xen::Config->new();
 
@@ -1548,9 +1467,9 @@ sub resize_disk_image {
         $cmd .= " --size=${target_size}M $image_path";
         $log->audit($cmd);
         #system $cmd and $log->error( "Error:  Unable to reduce filesystem on $image_name" );
-        open(FH, "| $cmd" ) or return $log->error("failed to shrink logical volume");
-        print FH "y\n";  # deals with the non-suppressible "Are you sure..." 
-        close FH;        # waits for the open process to exit
+        open(my $FH, '|', $cmd ) or return $log->error("failed to shrink logical volume");
+        print $FH "y\n";  # deals with the non-suppressible "Are you sure..." 
+        close $FH;        # waits for the open process to exit
         $log->audit("completed shrinking logical volume size");
         $self->do_fsck();
         return 1;
@@ -1861,7 +1780,7 @@ sub cleanup_inactive_snapshots {
     my $ps = $util->find_bin('ps',debug=>0);
     my $grep = $util->find_bin('grep',debug=>0);
 
-    foreach my $snap ( </dev/vol00/*_snap> ) {
+    foreach my $snap ( glob('/dev/vol00/*_snap') ) {
         my ($veid) = $snap =~ /\/([0-9]+)_rootimg_snap/;
         next if ! $veid;
         my @rsync_procs = `$ps ax | $grep rsync | $grep -v grep | $grep $veid`;
@@ -1879,10 +1798,6 @@ sub cleanup_inactive_snapshots {
 
 __END__
 
-=head1 NAME
-
-Provision::Unix::VirtualOS::Linux::Xen - Provision Xen VEs
-
 =head1 SYNOPSIS
 
   use Provision::Unix;
@@ -1894,12 +1809,6 @@ Provision::Unix::VirtualOS::Linux::Xen - Provision Xen VEs
   $vos->create()
   
 General 
-
-=head1 AUTHOR
-
-Matt Simerson, C<< <matt at tnpi.net> >>
-
-
 
 =head1 BUGS
 
@@ -1937,14 +1846,6 @@ L<http://search.cpan.org/dist/Provision-Unix>
 
 
 =head1 ACKNOWLEDGEMENTS
-
-
-=head1 COPYRIGHT & LICENSE
-
-Copyright (c) 2009 Matt Simerson
-
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
 
 
 =cut
