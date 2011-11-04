@@ -1,5 +1,5 @@
 package Provision::Unix::VirtualOS;
-# ABSTRACT: Provision virtual environments (VEs)
+# ABSTRACT: Provision virtual computers (VPS,VM,VE,Jail,etc)
 
 use strict;
 use warnings;

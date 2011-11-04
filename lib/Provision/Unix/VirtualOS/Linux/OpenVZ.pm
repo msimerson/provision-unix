@@ -1025,8 +1025,7 @@ sub _is_valid_template {
 
         $prov->audit("fetching $file from " . $uri->host);
 
-        $util->file_get(
-            url   => $template,
+        $util->get_url( $template,
             dir   => $template_dir,
             fatal => 0,
             debug => 0,

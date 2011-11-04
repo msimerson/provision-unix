@@ -4,7 +4,7 @@ package Provision::Unix::User::FreeBSD;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use English qw( -no_match_vars );
 use Carp;
@@ -15,9 +15,7 @@ use lib 'lib';
 my ( $prov, $user, $util );
 
 sub new {
-
     my $class = shift;
-
     my %p = validate(
         @_,
         {   prov  => { type => OBJECT },
@@ -43,9 +41,7 @@ sub new {
 }
 
 sub create {
-
     my $self = shift;
-
     my %p = validate(
         @_,
         {   'username' => { type => SCALAR },
@@ -58,6 +54,7 @@ sub create {
             'domain'   => { type => SCALAR | UNDEF, optional => 1 },
             'expire'   => { type => SCALAR | UNDEF, optional => 1 },
             'quota'    => { type => SCALAR | UNDEF, optional => 1 },
+            'disable_paranoi' => { type => SCALAR, optional => 1 },
             'debug'    => { type => SCALAR, optional => 1, default => 1 },
             'test_mode' => { type => SCALAR, optional => 1 },
         }
@@ -75,11 +72,15 @@ sub create {
     $user->{username} = $username;
     $user->_is_valid_username() or return;
 
-    my $bak = $util->file_archive( "/etc/master.passwd",
-        fatal => 0,
-        debug => 0,
-    );
-    $prov->audit("user->create: backed up master.passwd to $bak");
+    if ( ! $p{disable_paranoi} ) {
+        my $bak = $util->archive_file( "/etc/master.passwd",
+            fatal => 0,
+            debug => 0,
+            destdir => '/var/backups',
+            mode    => oct(0),
+        );
+        $prov->audit("user->create: backed up master.passwd to $bak");
+    };
 
     # pw creates accounts using defaults from /etc/pw.conf
     my $pw = $util->find_bin( "pw", debug => 0 );
@@ -121,7 +122,9 @@ sub create {
 
 ### TODO
     # call verify_master_passwd
+
     # set up user quotas
+    # $user->quota_set( ... )
 
     return $self->exists($username)
         ? $prov->progress( num => 10, desc => 'created successfully' )
@@ -187,9 +190,11 @@ sub destroy {
 ### TODO
     # this would be a good time to archive the user if desired.
 
-    my $bak = $util->file_archive( "/etc/master.passwd",
+    my $bak = $util->archive_file( "/etc/master.passwd",
         fatal => $p{fatal},
         debug => $p{debug},
+        destdir => '/var/backups',
+        mode    => oct(0),
     );
     $prov->progress( num => 2, desc => "backed up master.passwd." );
 
@@ -240,9 +245,11 @@ sub destroy_group {
         );
     }
 
-    my $bak = $util->file_archive( "/etc/group",
+    my $bak = $util->archive_file( "/etc/group",
         fatal => $p{fatal},
         debug => $p{debug},
+        destdir => '/var/backups',
+        mode    => oct(0),
     );
     $prov->progress( num => 2, desc => "backed up /etc/group" );
 
@@ -317,7 +324,7 @@ sub verify_master_passwd {
                 print
                     "verify_master_passwd: WARNING: new $passwd size ($new) is not larger than $old and we expected it to $change.\n"
                     if $debug;
-                $util->file_archive( "$passwd.bak" );
+                $util->archive_file( "$passwd.bak", destdir => '/var/backups', mode => oct(0) );
                 $r{'error_code'} = 500;
                 $r{'error_desc'}
                     = "new $passwd size ($new) is not larger than $old and we expected it to $change.\n";
@@ -346,7 +353,7 @@ sub verify_master_passwd {
                 $r{'error_code'} = 500;
                 $r{'error_desc'}
                     = "new $passwd size ($new) is not smaller than $old and we expected it to $change.\n";
-                $util->file_archive( "$passwd.bak" );
+                $util->archive_file( "$passwd.bak", destdir => '/var/backups', mode => oct(0) );
                 return \%r;
             }
         }

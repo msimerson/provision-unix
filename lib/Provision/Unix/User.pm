@@ -1,10 +1,10 @@
 package Provision::Unix::User;
-# ABSTRACT: provision unix accounts on Unix(like) systems!
+# ABSTRACT: provision unix user accounts
 
 use strict;
 use warnings;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 use English qw( -no_match_vars );
 use File::Path;
@@ -120,7 +120,7 @@ sub set_password {
     return $self->{os}->set_password(@_);
 };
 
-sub user_quota {
+sub quota_set {
 
     # Quota::setqlim($dev, $uid, $bs, $bh, $is, $ih, $tlo, $isgrp);
     # $dev     - filesystem mount or device

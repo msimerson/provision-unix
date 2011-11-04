@@ -1,5 +1,5 @@
 package Provision::Unix::VirtualOS::Linux;
-# ABSTRACT: a framework for building virtual machines (VPS/VE/Jail)
+# ABSTRACT: a framework for building Linux virtual machines
 
 use strict;
 use warnings;
@@ -99,7 +99,7 @@ sub install_kernel_modules {
 #    foreach my $mod ( qw/ modules module-fuse headers / ) {
             next if $mod eq 'headers' && ! "$fs_root/usr/src";
             my $file = "xen-$mod-$version.tar.gz";
-            $util->file_get( url => "$url/$file", %std_opts ) or return;
+            $util->get_url( "$url/$file", %std_opts ) or return;
             $util->syscmd( "tar -zxpf $file -C $fs_root", %std_opts ) or return;
             unlink $file;
         };

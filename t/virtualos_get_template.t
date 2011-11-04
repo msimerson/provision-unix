@@ -46,8 +46,8 @@ ok( $template_dir, "get_template_dir, $template_dir");
 
         next if ( $brand eq 'spry' && $virt_type eq 'xen' );
 
-        my $r = $util->file_get( 
-            url   => "http://$brand-$virt_type.templates.int.spry.com/$template_that_exists.tar.gz",
+        my $r = $util->get_url( 
+            "http://$brand-$virt_type.templates.int.spry.com/$template_that_exists.tar.gz",
             dir   => $template_dir,
             fatal => 0,
             debug => 1,

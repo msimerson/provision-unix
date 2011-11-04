@@ -230,10 +230,10 @@ Revision history for Provision-Unix
   - report errors in P:U:V:L:X:get_fs_* methods
   - P:U:User:Linux::exists* methods failed for and uig/gid of zero
   - P:U:V, added @std_opts and %std_opts, removing 75 lines of redundant code
-  - replace curl with $util->file_get to fetch kernel modules in P:U:V:L.
-  - added dir param to $util->file_get, moves d/l file to that dir
+  - replace curl with $util->get_url to fetch kernel modules in P:U:V:L.
+  - added dir param to $util->get_url, moves d/l file to that dir
   - use killall to kill nscd, the pid in the pidfile is oft stale
-  - added LWP method in $util->file_get if LWP::Simple and URI are installed
+  - added LWP method in $util->get_url if LWP::Simple and URI are installed
   - reworked the template fetching logic to be simpler
 
 0.67 Sep 19, 2009

@@ -199,7 +199,7 @@ SKIP: {
 
     skip "Quota.pm is not installed", 1 if $@;
 
-    ok( $prov->quota_set( user => 'matt', debug => 0 ), 'quota_set' );
+    ok( $user->quota_set( user => 'matt', debug => 0 ), 'quota_set' );
 }
 
 # user
