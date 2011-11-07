@@ -6,7 +6,6 @@ use warnings;
 
 our $VERSION = '0.09';
 
-use Carp;
 use Params::Validate qw( :all );
 
 use lib "lib";

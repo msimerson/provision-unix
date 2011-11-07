@@ -1,5 +1,11 @@
 Revision history for Provision-Unix
 
+1.03 Nov 07, 2011
+  - dependency updates so tests work on perl < 5.8 
+
+1.02 Nov 04, 2011
+  - FreeBSD user functions make secure backups
+
 1.01 Nov 01, 2011
   - remove Switch from Xen::Config
   - Utility::ask allows undefined default to be passed in

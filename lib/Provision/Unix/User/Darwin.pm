@@ -7,7 +7,6 @@ use warnings;
 our $VERSION = '0.16';
 
 use English qw( -no_match_vars );
-use Carp;
 use Params::Validate qw( :all );
 
 use lib 'lib';
@@ -171,7 +170,7 @@ sub _create_niutil {
 
     $util->syscmd( "$dirutil -create . /users/$user",
         debug => $debug,
-    ) or croak "failed to create user $user\n";
+    ) or die "failed to create user $user\n";
 
     $prov->progress( num => 6, desc => "configuring $user" );
 

@@ -7,7 +7,6 @@ use warnings;
 our $VERSION = '5.31';
 
 use Cwd;
-use Carp;
 use English qw( -no_match_vars );
 use File::Basename;
 use File::Copy;
@@ -927,7 +926,7 @@ TRY:
 
     # this keeps us from failing if the box has only internal IPs 
     if ( @ips < 1 || $ips[0] eq "" ) {
-        carp "yikes, you really don't have any public IPs?!" if $debug;
+        warn "you really don't have any public IPs?!" if $debug;
         $p{exclude_internals} = 0;
         $once++;
         goto TRY if ( $once < 2 );
@@ -2166,7 +2165,7 @@ sub syscmd {
 
     my $before_path = $ENV{PATH};
 
-    # instead of croaking, maybe try setting a
+    # instead of dying, maybe try setting a
     # very restrictive PATH?  I'll err on the side of safety 
     # $ENV{PATH} = '';
     return $log->error( "syscmd request has tainted data", %args)
@@ -2243,7 +2242,7 @@ sub yes_or_no {
 
     # force if interactivity testing is not working properly.
     if ( !$p{force} && !$self->is_interactive ) {
-        carp "not running interactively, can't prompt!";
+        warn "not running interactively, can't prompt!";
         return;
     }
 
@@ -2279,7 +2278,7 @@ sub yes_or_no {
         };
 
         if ($@) {
-            $@ eq "alarm\n" ? print "timed out!\n" : carp;
+            $@ eq "alarm\n" ? print "timed out!\n" : warn;
         }
 
         return ($response && $response eq "y") ? 1 : 0;

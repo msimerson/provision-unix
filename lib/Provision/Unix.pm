@@ -6,7 +6,6 @@ use warnings;
 
 our $VERSION = '1.01';
 
-use Carp;
 use Config::Tiny;
 use Cwd;
 use Data::Dumper;
@@ -142,7 +141,7 @@ sub error {
             $self->dump_audit();  # dump if err is fatal and debug is not set
             $self->dump_errors();
         };
-        croak "FATAL ERROR";
+        die "FATAL ERROR";
     };
     return;
 }

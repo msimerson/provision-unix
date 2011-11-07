@@ -7,7 +7,6 @@ use warnings;
 our $VERSION = '0.20';
 
 use English qw( -no_match_vars );
-use Carp;
 use Params::Validate qw( :all );
 
 use lib 'lib';

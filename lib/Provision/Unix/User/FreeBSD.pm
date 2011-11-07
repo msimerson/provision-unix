@@ -7,7 +7,6 @@ use warnings;
 our $VERSION = '0.11';
 
 use English qw( -no_match_vars );
-use Carp;
 use Params::Validate qw( :all );
 
 use lib 'lib';
@@ -406,7 +405,7 @@ returns a boolean.
         or $prov->error( "couldn't cd to $path: $!\n" );
 
     if ( -e "$path/$user.tar.gz" && -d "$path/$user" ) {
-        carp "user_archive:\tReplacing old tarfile $path/$user.tar.gz.\n";
+        warn "user_archive:\tReplacing old tarfile $path/$user.tar.gz.\n";
         system "$rm $path/$user.tar.gz";
     }
 
@@ -419,7 +418,7 @@ returns a boolean.
         return 1;
     }
     else {
-        carp "\nFAILED: user_archive couldn't complete $homedir.tar.gz.\n\n";
+        warn "\nFAILED: user_archive couldn't complete $homedir.tar.gz.\n\n";
         return 0;
     }
 }
