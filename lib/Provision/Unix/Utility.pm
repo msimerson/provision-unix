@@ -2138,7 +2138,7 @@ sub syscmd {
         @args = split /\s+/, $cmd;  # split on whitespace
         $bin = shift @args;
         $is_safe++;
-        $log->audit("\tprogram: $bin, args : " . join ' ', @args, %args);
+        $log->audit("\tprogram: $bin, args : " . join ' ', @args );
     }
     else {
         # does not not contain a ./ pattern
@@ -2444,7 +2444,7 @@ The advantage this sub has over a Pure Perl implementation is that it can utiliz
 
 
   ############### chown_system #################
-  # Usage      : $util->chown_system( dir=>"/tmp/example", user=>'matt' );
+  # Usage      : $util->chown_system( "/tmp/example", user=>'matt' );
   # Purpose    : change the ownership of a file or directory
   # Returns    : 0 - failure,  1 - success
   # Parameters : S - dir    - the directory to chown

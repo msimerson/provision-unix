@@ -184,6 +184,18 @@ SKIP: {
             "create $username"
         );
 
+
+# quota_set
+SKIP: {
+    my $uid;
+    eval { require Quota; $uid = getpwnam($username) };
+
+    skip "Quota.pm is not installed", 1 if $@;
+
+    ok( $user->quota_set( user => $username, debug => 0 ), 'quota_set' );
+}
+
+
         ok( $user->destroy(
                 username => $username,
                 debug    => 0,
@@ -191,15 +203,6 @@ SKIP: {
             "destroy $username"
         );
     }
-}
-
-# quota_set
-SKIP: {
-    eval { require Quota; };
-
-    skip "Quota.pm is not installed", 1 if $@;
-
-    ok( $user->quota_set( user => 'matt', debug => 0 ), 'quota_set' );
 }
 
 # user

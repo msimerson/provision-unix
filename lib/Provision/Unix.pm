@@ -257,7 +257,7 @@ sub progress {
     my $desc = $p{desc};
     my $err  = $p{err};
 
-    my $msg_length = length $desc;
+    my $msg_length = length $desc || 0;
     my $to_print   = 10;
     my $max_print  = 70 - $msg_length;
 

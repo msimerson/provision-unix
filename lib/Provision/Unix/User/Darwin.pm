@@ -154,7 +154,7 @@ sub _create_dscl {
             mode  => '0755',
             debug => 0
             );
-        $util->chown( dir => $homedir, uid => $user, debug => $debug );
+        $util->chown( $homedir, uid => $user, gid=>$p_user->{gid}, debug => $debug );
     }
 
     return getpwnam($user);
@@ -201,7 +201,7 @@ sub _create_niutil {
 
     if ($homedir) {
         mkdir $homedir, 0755;
-        $util->chown( dir => $homedir, uid => $user, debug => $debug );
+        $util->chown( $homedir, uid => $user, gid=>$p_user->{gid}, debug => $debug );
     }
 
     return getpwnam($user);
@@ -241,6 +241,12 @@ sub destroy {
     }
 
     $util->syscmd( $cmd, debug => 0 );
+
+    # flush the cache
+    my $cacheutil = $util->find_bin( "dscacheutil", debug => 0, fatal => 0 );
+    if ( -x $cacheutil ) {
+        $util->syscmd( "$cacheutil -flushcache", debug=>0, fatal=>0);
+    };
 
     return $self->exists($user)
         ? $prov->progress( num => 10, 'err' => 'failed' )
@@ -327,6 +333,12 @@ sub destroy_group {
             debug => $p{debug}
         );
     }
+
+    # flush the cache
+    my $cacheutil = $util->find_bin( "dscacheutil", debug => 0, fatal => 0 );
+    if ( -x $cacheutil ) {
+        $util->syscmd( "$cacheutil -flushcache", debug=>0, fatal=>0);
+    };
 
     return getgrnam( $p{group} )
         ? $prov->progress( num => 10, 'err' => 'failed!' )

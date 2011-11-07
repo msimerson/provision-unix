@@ -148,7 +148,7 @@ sub quota_set {
     require Quota;
 
     my $dev = $conf->{quota_filesystem} || "/home";
-    my $uid = getpwnam($username);
+    my $uid = getpwnam($username) or return $prov->error("no such user: $username");
 
     # set the soft limit a few megs higher than the hard limit
     my $quotabump = $quota + 5;
@@ -327,8 +327,8 @@ sub install_ssh_key {
     if ( $p{username} ) {
         my $uid = getpwnam $p{username};
         if ( $uid ) {
-            $util->chown( dir => $ssh_dir, uid => $uid, fatal => 0 );
-            $util->chown( dir => "$ssh_dir/authorized_keys", uid => $uid, fatal => 0 );
+            $util->chown( $ssh_dir, uid => $uid, fatal => 0 );
+            $util->chown( "$ssh_dir/authorized_keys", uid => $uid, fatal => 0 );
         }
         else {
             my $chown = $util->find_bin( 'chown', debug => 0 );
