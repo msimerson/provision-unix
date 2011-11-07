@@ -123,7 +123,7 @@ sub create {
     # call verify_master_passwd
 
     # set up user quotas
-    # $user->quota_set( ... )
+    # $user->quota_set( user => $username )
 
     return $self->exists($username)
         ? $prov->progress( num => 10, desc => 'created successfully' )

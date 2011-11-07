@@ -4,7 +4,7 @@ package Provision::Unix::User;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 use English qw( -no_match_vars );
 use File::Path;
@@ -134,16 +134,16 @@ sub quota_set {
     # parameter validation here
     my %p = validate(
         @_,
-        {   'conf'     => { type => HASHREF, optional => 1, },
-            'username' => { type => SCALAR,  optional => 0, },
-            'quota'    => { type => SCALAR,  optional => 1, default => 100 },
-            'fatal'    => { type => BOOLEAN, optional => 1, default => 1 },
-            'debug'    => { type => BOOLEAN, optional => 1, default => 1 },
+        {   'conf'   => { type => HASHREF, optional => 1, },
+            'user'   => { type => SCALAR,  optional => 0, },
+            'quota'  => { type => SCALAR,  optional => 1, default => 100 },
+            'fatal'  => { type => BOOLEAN, optional => 1, default => 1 },
+            'debug'  => { type => BOOLEAN, optional => 1, default => 1 },
         },
     );
 
     my ( $conf, $username, $quota, $fatal, $debug )
-        = ( $p{conf}, $p{username}, $p{quota}, $p{fatal}, $p{debug} );
+        = ( $p{conf}, $p{user}, $p{quota}, $p{fatal}, $p{debug} );
 
     require Quota;
 
