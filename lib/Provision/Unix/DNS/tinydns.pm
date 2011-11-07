@@ -155,6 +155,8 @@ sub create_zone_record {
 sub build_a {
     my ( $self, $p ) = @_;
 
+    # +fqdn:ip:ttl:timestamp:lo
+
     my $r = $self->{special}{A};
     $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= $p->{address} . ":";
@@ -166,6 +168,7 @@ sub build_a {
 sub build_mx {
     my ( $self, $p ) = @_;
 
+    # @fqdn:ip:x:dist:ttl:timestamp:lo
     my $r = $self->{special}{MX};
     $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= ":";    # ip leave blank, defined with an A record
@@ -179,6 +182,7 @@ sub build_mx {
 sub build_ns {
     my ( $self, $p ) = @_;
 
+    # &fqdn:ip:x:ttl:timestamp:lo   (NS + A)
     my $r = $self->{special}{NS};
     $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= ":";    # ip leave blank, defined with an A record
@@ -191,6 +195,7 @@ sub build_ns {
 sub build_cname {
     my ( $self, $p ) = @_;
 
+    # Cfqdn:p:ttl:timestamp:lo
     my $r = $self->{special}{CNAME};
     $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= $self->fully_qualify( $p->{zone}, $p->{address} ) . ".:";
@@ -202,6 +207,7 @@ sub build_cname {
 sub build_txt {
     my ( $self, $p ) = @_;
 
+    # 'fqdn:s:ttl:timestamp:lo
     my $r = $self->{special}{TXT};
     $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= $self->escape( $p->{address} ) . ":";
@@ -213,6 +219,7 @@ sub build_txt {
 sub build_ptr {
     my ( $self, $p ) = @_;
 
+    # ^fqdn:p:ttl:timestamp:lo
     my $r = $self->{special}{PTR};
 ## TODO
     # check that our zone matches NN.in-addr.arpa and/or a pattern
@@ -225,12 +232,15 @@ sub build_ptr {
     return $r;
 }
 
+sub build_soa {
+    my $self = shift;
+    # Zfqdn:mname:rname:ser:ref:ret:exp:min:ttl:timestamp:lo
+};
+
 sub build_srv {
     my ( $self, $p ) = @_;
 
-    #    $r .= $self->fully_qualify($p->{zone}, $p->{name}) . ":";
-    #    $r .= $self->escape($p->{address}) . ":";
-
+    # :fqdn:n:rdata:ttl:timestamp:lo (Generic record)
     my $priority = $p->{priority};
     my $weight   = $p->{weight};
     my $port     = $p->{port};
@@ -272,6 +282,7 @@ sub build_srv {
 sub build_aaaa {
     my ( $self, $p ) = @_;
 
+# :fqdn:n:rdata:ttl:timestamp:lo (generic record format)
 # ffff:1234:5678:9abc:def0:1234:0:0
 # :example.com:28:\377\377\022\064\126\170\232\274\336\360\022\064\000\000\000\000
 
