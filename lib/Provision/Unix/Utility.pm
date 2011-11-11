@@ -16,6 +16,7 @@ use File::stat;
 use Params::Validate qw(:all);
 use Scalar::Util qw( openhandle );
 use URI;
+use utf8;
 
 use lib 'lib';
 use vars qw/ $log %std_opts /;
