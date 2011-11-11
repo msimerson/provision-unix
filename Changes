@@ -1,7 +1,16 @@
 Revision history for Provision-Unix
 
+{{$NEXT}}
+
 1.03 Nov 07, 2011
   - dependency updates so tests work on perl < 5.8 
+  - chown api changes due to M:T:U import
+  - when destroying users on Darwin (Mac), flush the cache before testing if the command succeeded.
+  - when setting a test quota, use the test user.
+  - quota_set: renamed param username -> user to match use
+  - dist.ini: added autoprereqs & use utf8
+  - P:U:DNS:tinydns: added comments for tinydns-data record formats
+  - P:U:DNS: renamed fully_qualify -> qualify
 
 1.02 Nov 04, 2011
   - FreeBSD user functions make secure backups

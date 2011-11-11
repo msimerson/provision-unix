@@ -26,13 +26,11 @@ else {
 
 #warn Dumper ( $dns );
 
-# fully_qualify
+# qualify
 if ( lc( $prov->{config}{DNS}{server} ) ne 'nictool' ) {
-    ok( $dns->fully_qualify( 't.com', 'w' ) eq 'w.t.com', 'fully_qualify' );
-    ok( $dns->fully_qualify( 't.com', 'w.t.com' ) eq 'w.t.com',
-        'fully_qualify' );
-    ok( $dns->fully_qualify( 't.com', 'w.t.com.' ) eq 'w.t.com.',
-        'fully_qualify' );
+    ok( $dns->qualify( 't.com', 'w' ) eq 'w.t.com', 'qualify' );
+    ok( $dns->qualify( 't.com', 'w.t.com' ) eq 'w.t.com', 'qualify' );
+    ok( $dns->qualify( 't.com', 'w.t.com.' ) eq 'w.t.com.', 'qualify' );
 }
 
 #$prov->error('test breakpoint');

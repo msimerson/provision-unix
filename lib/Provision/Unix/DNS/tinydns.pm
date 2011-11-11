@@ -69,7 +69,7 @@ sub create_zone {
 # SOA, Zfqdn:mname:rname:ser:ref:ret:exp:min:ttl:timestamp:lo
 #Ztesting.com:x2.nictool.com.:hostmaster.testing.com::16384:2048:1048576:2560:86400::
 
-    my $nameserver = $self->fully_qualify( $zone, $p{nameserver} || "a.ns" );
+    my $nameserver = $self->qualify( $zone, $p{nameserver} || "a.ns" );
 
     my $soa = $self->{special}{SOA};
 
@@ -157,12 +157,11 @@ sub build_a {
 
     # +fqdn:ip:ttl:timestamp:lo
 
-    my $r = $self->{special}{A};
-    $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
-    $r .= $p->{address} . ":";
-    $r .= $p->{ttl} || $prov->{config}{DNS}{ttl};
-
-    return $r;
+    return $self->{special}{A}
+     . $self->qualify( $p->{zone}, $p->{name} ) 
+     . ':' . $p->{address} 
+     . ':' . $p->{ttl} || $prov->{config}{DNS}{ttl}
+     . '::';
 }
 
 sub build_mx {
@@ -170,9 +169,9 @@ sub build_mx {
 
     # @fqdn:ip:x:dist:ttl:timestamp:lo
     my $r = $self->{special}{MX};
-    $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
+    $r .= $self->qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= ":";    # ip leave blank, defined with an A record
-    $r .= $self->fully_qualify( $p->{zone}, $p->{address} ) . ".:";
+    $r .= $self->qualify( $p->{zone}, $p->{address} ) . ".:";
     $r .= $p->{weight} . ":";
     $r .= $p->{ttl} || $prov->{config}{DNS}{ttl};
 
@@ -184,9 +183,9 @@ sub build_ns {
 
     # &fqdn:ip:x:ttl:timestamp:lo   (NS + A)
     my $r = $self->{special}{NS};
-    $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
+    $r .= $self->qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= ":";    # ip leave blank, defined with an A record
-    $r .= $self->fully_qualify( $p->{zone}, $p->{address} ) . ".:";
+    $r .= $self->qualify( $p->{zone}, $p->{address} ) . ".:";
     $r .= $p->{ttl} || $prov->{config}{DNS}{ttl};
 
     return $r;
@@ -197,8 +196,8 @@ sub build_cname {
 
     # Cfqdn:p:ttl:timestamp:lo
     my $r = $self->{special}{CNAME};
-    $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
-    $r .= $self->fully_qualify( $p->{zone}, $p->{address} ) . ".:";
+    $r .= $self->qualify( $p->{zone}, $p->{name} ) . ":";
+    $r .= $self->qualify( $p->{zone}, $p->{address} ) . ".:";
     $r .= $p->{ttl} || $prov->{config}{DNS}{ttl};
 
     return $r;
@@ -209,7 +208,7 @@ sub build_txt {
 
     # 'fqdn:s:ttl:timestamp:lo
     my $r = $self->{special}{TXT};
-    $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
+    $r .= $self->qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= $self->escape( $p->{address} ) . ":";
     $r .= $p->{ttl} || $prov->{config}{DNS}{ttl};
 
@@ -225,7 +224,7 @@ sub build_ptr {
     # check that our zone matches NN.in-addr.arpa and/or a pattern
     # the can be automatically expanded as such
 
-    $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ":";
+    $r .= $self->qualify( $p->{zone}, $p->{name} ) . ":";
     $r .= $p->{address} . ":";
     $r .= $p->{ttl} || $prov->{config}{DNS}{ttl};
 
@@ -263,12 +262,12 @@ sub build_srv {
 
     my $target = "";
     my @chunks = split /\./,
-        $self->fully_qualify( $p->{zone}, $p->{address} );
+        $self->qualify( $p->{zone}, $p->{address} );
     foreach my $chunk (@chunks) {
         $target .= characterCount($chunk) . $chunk;
     }
 
-    my $service = $self->fully_qualify( $p->{zone}, $p->{name} );
+    my $service = $self->qualify( $p->{zone}, $p->{name} );
     $service = escape($service);
 
     my $r = ":";
@@ -301,14 +300,14 @@ sub build_aaaa {
     $h = escapeHex( sprintf "%04s", $h );
 
     my $r = ':';
-    $r .= $self->fully_qualify( $p->{zone}, $p->{name} ) . ':';
+    $r .= $self->qualify( $p->{zone}, $p->{name} ) . ':';
     $r .= '28:' . "$a$b$c$d$e$f$g$h" . ':';
     $r .= $p->{ttl} || $prov->{config}{DNS}{ttl};
 
     return $r;
 }
 
-sub fully_qualify {
+sub qualify {
     my $self = shift;
     my ( $zone, $record ) = @_;
 

@@ -110,7 +110,7 @@ sub dns_create {
     $request{type}    = uc($type);
     $request{name}    = $name || $util->ask( "the zone record name" );
     if ( lc( $prov->{config}{DNS}{server} ) ne 'nictool' ) {
-        $request{name} = $dns->fully_qualify( $zone, $request{name} );
+        $request{name} = $dns->qualify( $zone, $request{name} );
     }
     $request{address} = $name || $util->ask( "the zone record address" );
     $request{ttl}     = $name || $util->ask( "the TTL",

@@ -4,7 +4,7 @@ package Provision::Unix::DNS;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use English qw( -no_match_vars );
 use Params::Validate qw(:all);
@@ -115,13 +115,13 @@ sub delete_zone_record {
     return $self->{server}->delete_zone_record(@_);
 }
 
-sub fully_qualify {
+sub qualify {
 
  # this is server dependent. BIND and NicTool support shortcuts like @. Others
  # need to be fully qualified (like tinydns).
 
     my $self = shift;
-    return $self->{server}->fully_qualify(@_);
+    return $self->{server}->qualify(@_);
 }
 
 sub _get_server {
