@@ -8,7 +8,6 @@ use English qw/ -no_match_vars /;
 
 use Test::More;
 
-tests => 32;
 
 use lib 'lib';
 
@@ -16,7 +15,7 @@ if ( ! -d 'bin' ) {
     plan skip_all => "unable to find bin";
 } 
 else {
-    plan 'no_plan';
+    plan tests => 32;
 }
 
 my $this_perl = $Config{'perlpath'} || $EXECUTABLE_NAME;
