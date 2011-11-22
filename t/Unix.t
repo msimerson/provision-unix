@@ -71,7 +71,7 @@ if ( 0 == 1 ) {
 }
 
 # find_config
-if ( $OSNAME ne 'cygwin' ) {
+if ( $OSNAME !~ /cygwin|win32/ ) {
     ok( $prov->find_config(
             file  => 'services',
             debug => 0,

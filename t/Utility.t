@@ -6,6 +6,9 @@ use lib "lib";
 
 use Cwd;
 use English qw( -no_match_vars );
+use File::Path;
+use File::Spec;
+use File::stat;
 use Test::More 'no_plan';
 
 my $deprecated = 0;    # run the deprecated tests.
@@ -31,16 +34,15 @@ if ( -e "Utility.t" ) { chdir "../"; }
 
 # we need this stuff during subsequent tests
 my $debug = 0;
-my ($cwd) = cwd =~ /^([\/\w\-\s\.]+)$/;       # get our current directory
+my $cwd = Cwd::cwd;
+ok( -d $cwd, "cwd: $cwd" );
 
-print "\t\twd: $cwd\n" if $debug;
-
-my $tmp = "$cwd/t/trash";
-mkdir $tmp, 0755;
+my $tmp = File::Spec->catfile($cwd,'t','trash');
+File::Path::make_path($tmp, { mode => 0755 });
 if ( ! -d $tmp ) {
     $util->mkdir_system( dir => $tmp, fatal => 0 );
 };
-skip "$tmp dir creation failed!\n", 2 if ( ! -d $tmp );
+skip "$tmp dir creation failed!\n", 2 if ! -d $tmp;
 ok( -d $tmp, "temp dir: $tmp" );
 ok( $util->syscmd( "cp TODO $tmp/", fatal => 0 ), 'cp TODO' );
 
@@ -80,14 +82,16 @@ my $tar  = $util->find_bin( "tar",  fatal => 0 );
 my $star  = $util->find_bin( "star",  fatal => 0 );
 
 SKIP: {
-    skip "gzip or tar is missing!\n", 6 unless ( -x $gzip and -x $tar and -d $tmp );
-    ok( $util->syscmd( "$tar -cf $tmp/test.tar TODO", fatal => 0),
+    skip "gzip or tar is missing!\n", 6 
+        unless ( -x $gzip and -x $tar and -d $tmp );
+
+    my $tarfile = File::Spec->catfile($tmp,'test.tar');
+    ok( $util->syscmd( "$tar -cf $tarfile TODO", fatal => 0),
         "tar -cf test.tar"
     );
-    ok( $util->syscmd( "$gzip -f $tmp/test.tar", fatal => 0), 'gzip test.tar'
-    );
+    ok( $util->syscmd( "$gzip -f $tarfile", fatal => 0), 'gzip test.tar' );
 
-    my $archive = "$tmp/test.tar.gz";
+    my $archive = "$tarfile.gz";
     ok( -e $archive, 'temp archive exists' );
 
     ok( $util->extract_archive( $archive, fatal => 0 ), 'extract_archive +');
@@ -111,8 +115,9 @@ $log->{last_error} = scalar @{$log->{errors}};
 ok( $util->cwd_source_dir( $tmp ), 'cwd_source_dir' );
 
 # clean up after previous runs
-if ( -f "$tmp/foo" ) {
-    ok( $util->file_delete( file => "$tmp/foo", fatal => 0 ), 'file_delete' );
+my $cleanit = File::Spec->catfile($tmp,'foo');
+if ( -f $cleanit ) {
+    ok( $util->file_delete( file => $cleanit, fatal => 0 ), 'file_delete' );
 }
 
 # a dir to create
@@ -268,8 +273,7 @@ SKIP: {
 
 # chmod
 # get the permissions of the file in octal file mode
-use File::stat;
-my $st = stat($rwtest) or warn "No $tmp: $!\n";
+my $st = File::stat::stat($rwtest) or warn "No $tmp: $!\n";
 my $before = sprintf "%lo", $st->mode & 07777;
 
 #$util->syscmd( "ls -al $rwtest" );   # use ls -al to view perms
@@ -571,7 +575,8 @@ $log->dump_audit( quiet => 1 );
 $log->{last_error} = scalar @{$log->{errors}};
 
 # syscmd
-my $tmpfile = '/tmp/provision-unix-test';
+my $tmpfile = File::Spec->catfile(
+    File::Spec->rootdir(), 'tmp','provision-unix-test' );
 ok( $util->syscmd( "touch $tmpfile", fatal => 0 ), 'syscmd +');
 ok( ! $util->syscmd( "rm $tmpfile.nonexist", fatal => 0,debug=>0 ), 'syscmd -');
 ok( ! $util->syscmd( "rm $tmpfile.nonexist", fatal => 0,,debug=>0, timeout=>1), 'syscmd - (w/timeout)');

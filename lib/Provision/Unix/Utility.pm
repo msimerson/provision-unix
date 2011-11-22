@@ -125,8 +125,8 @@ PROMPT:
 
     chomp $response;
 
-    return $response if $response; # if they typed something, return it
-    return $default if $default;   # return the default, if available
+    return $response if defined $response; # if they typed something, return it
+    return $default if defined $default;   # return the default, if available
     return '';                     # return empty handed
 }
 
