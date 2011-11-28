@@ -14,6 +14,9 @@ use lib 'lib';
 if ( ! -d 'bin' ) {
     plan skip_all => "unable to find bin";
 } 
+elsif ( $OSNAME =~ /cygwin|win32/ ) {
+    plan skip_all => "doesn't work on windows";
+}
 else {
     plan tests => 32;
 }

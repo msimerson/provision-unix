@@ -4,7 +4,7 @@ package Provision::Unix::Web::Apache;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use English qw( -no_match_vars );
 use Params::Validate qw( :all );
@@ -439,7 +439,7 @@ sub destroy {
 
     print "Dropping: \n" . join( "\n", @$drop ) . "\n";
 
-    if ( length @$new == 0 || length @$drop == 0 ) {
+    if ( scalar @$new == 0 || scalar @$drop == 0 ) {
         return {
             error_code => 500,
             error_desc => "yikes, something went horribly wrong!"
