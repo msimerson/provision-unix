@@ -4,7 +4,7 @@ package Provision::Unix;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.05';
 
 use Config::Tiny;
 use Cwd;

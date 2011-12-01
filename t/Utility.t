@@ -5,8 +5,8 @@ use strict;
 use lib "lib";
 
 use Cwd;
-use English qw( -no_match_vars );
-use File::Path;
+use English qw/ -no_match_vars /;
+use File::Path 2.08 qw/ make_path /;
 use File::Spec;
 use File::stat;
 use Test::More;
@@ -45,7 +45,7 @@ my $cwd = Cwd::cwd;
 ok( -d $cwd, "cwd: $cwd" );
 
 my $tmp = File::Spec->catfile($cwd,'t','trash');
-File::Path::make_path($tmp, { mode => 0755 });
+make_path($tmp, { mode => 0755 });
 if ( ! -d $tmp ) {
     $util->mkdir_system( dir => $tmp, fatal => 0 );
 };
