@@ -1,13 +1,21 @@
 
 use strict;
-use warnings;
+#use warnings;
 
 use English qw( -no_match_vars );
-use Test::More 'no_plan';
+use Test::More;
+
+if ( $OSNAME =~ /cygwin|win32|windows/i ) {
+    plan skip_all => "doesn't work on windows";
+}
+else {
+    plan 'no_plan';
+};
+
 
 use lib "lib";
 
-BEGIN { use_ok('Provision::Unix'); }
+use_ok('Provision::Unix');
 require_ok('Provision::Unix');
 
 # let the testing begin

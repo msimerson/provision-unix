@@ -1,7 +1,18 @@
 
-use Test::More tests => 6;
+use strict;
+#use warnings;
 
-use lib "lib";
+use English qw/ -no_match_vars /;
+use Test::More;
+
+if ( $OSNAME =~ /cygwin|win32|windows/i ) {
+    plan skip_all => "doesn't work on windows";
+}
+else {
+    plan tests => 6;
+};
+
+use lib 'lib';
 
 BEGIN {
     use_ok('Provision::Unix');
