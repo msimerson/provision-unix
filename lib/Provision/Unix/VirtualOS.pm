@@ -4,8 +4,6 @@ package Provision::Unix::VirtualOS;
 use strict;
 use warnings;
 
-our $VERSION = '0.59';
-
 use Data::Dumper;
 use English qw( -no_match_vars );
 use LWP::Simple;

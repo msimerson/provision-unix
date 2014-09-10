@@ -7,8 +7,6 @@ use warnings;
 use lib 'lib';
 use base 'Provision::Unix::VirtualOS::Linux::OpenVZ';
 
-our $VERSION = '0.13';
-
 use English qw( -no_match_vars );
 use File::Copy;
 use Params::Validate qw(:all);

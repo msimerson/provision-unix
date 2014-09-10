@@ -4,8 +4,6 @@ package Provision::Unix::User;
 use strict;
 use warnings;
 
-our $VERSION = '0.28';
-
 use English qw( -no_match_vars );
 use File::Path;
 use Params::Validate qw( :all );

@@ -4,8 +4,6 @@ package Provision::Unix::Web::Lighttpd;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
-
 use Params::Validate qw( :all );
 
 use lib "lib";

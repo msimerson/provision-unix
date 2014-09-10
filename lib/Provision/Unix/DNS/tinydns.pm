@@ -4,8 +4,6 @@ package Provision::Unix::DNS::tinydns;
 use strict;
 use warnings;
 
-our $VERSION = '0.53';
-
 use Cwd;
 use English qw( -no_match_vars );
 use Params::Validate qw(:all);

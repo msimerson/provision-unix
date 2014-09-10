@@ -4,8 +4,6 @@ package Provision::Unix::Utility;
 use strict;
 use warnings;
 
-our $VERSION = '5.31';
-
 use Cwd;
 use English qw( -no_match_vars );
 use File::Basename;

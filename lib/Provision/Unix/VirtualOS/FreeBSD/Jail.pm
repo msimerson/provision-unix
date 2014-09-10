@@ -4,8 +4,6 @@ package Provision::Unix::VirtualOS::FreeBSD::Jail;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
-
 use English qw( -no_match_vars );
 use Params::Validate qw(:all);
 

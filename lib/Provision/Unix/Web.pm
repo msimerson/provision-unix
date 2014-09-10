@@ -4,8 +4,6 @@ package Provision::Unix::Web;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
-
 use Params::Validate qw( :all );
 
 use lib "lib";

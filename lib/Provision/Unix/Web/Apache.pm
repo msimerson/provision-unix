@@ -4,8 +4,6 @@ package Provision::Unix::Web::Apache;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
-
 use English qw( -no_match_vars );
 use Params::Validate qw( :all );
 

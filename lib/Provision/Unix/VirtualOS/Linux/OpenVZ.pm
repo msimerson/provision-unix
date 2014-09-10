@@ -4,8 +4,6 @@ package Provision::Unix::VirtualOS::Linux::OpenVZ;
 use strict;
 use warnings;
 
-our $VERSION = '0.51';
-
 use English qw( -no_match_vars );
 use File::Copy;
 use Params::Validate qw(:all);

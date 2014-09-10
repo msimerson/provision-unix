@@ -4,8 +4,6 @@ package Provision::Unix::User::FreeBSD;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
-
 use English qw( -no_match_vars );
 use Params::Validate qw( :all );
 

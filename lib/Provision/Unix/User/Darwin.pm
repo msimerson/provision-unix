@@ -4,8 +4,6 @@ package Provision::Unix::User::Darwin;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
-
 use English qw( -no_match_vars );
 use Params::Validate qw( :all );
 

@@ -4,8 +4,6 @@ package Provision::Unix::VirtualOS::Xen::Config;
 use strict;
 use warnings;
 
-our $VERSION = 0.4;
-
 sub new {
     my $class = shift;
     my $self = {

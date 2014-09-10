@@ -4,8 +4,6 @@ package Provision::Unix::VirtualOS::Linux;
 use strict;
 use warnings;
 
-our $VERSION = '0.27';
-
 use File::Copy;
 use File::Path;
 #use English qw( -no_match_vars );

@@ -4,8 +4,6 @@ package Provision::Unix::VirtualOS::Linux::Xen;
 use strict;
 use warnings;
 
-our $VERSION = '0.70';
-
 #use Data::Dumper;
 use English qw( -no_match_vars );
 use File::Copy;

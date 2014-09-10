@@ -4,8 +4,6 @@ package Provision::Unix::User::Linux;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
-
 use English qw( -no_match_vars );
 use Params::Validate qw( :all );
 
