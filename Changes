@@ -2,6 +2,12 @@ Revision history for Provision-Unix
 
 {{$NEXT}}
 
+1.08      2015-05-01
+  - change version of Apache::Admin::Config from 1 -> 0.95
+
+1.07      2014-10-10
+  - packaging updates
+
 1.06      2013-04-19
   - packaging updates
   - better detection of Windows, to avoid test failures

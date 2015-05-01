@@ -508,29 +508,5 @@ You can find documentation for this module with the perldoc command.
 
     perldoc Provision::Unix
 
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Provision-Unix>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Provision-Unix>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Provision-Unix>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Provision-Unix>
-
-=back
-
-
 =cut
 
